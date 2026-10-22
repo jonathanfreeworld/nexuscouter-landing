@@ -6,14 +6,14 @@ st.set_page_config(page_title="AI 해외 마케팅 및 바이어 발굴 어드�
 st.title("🌐 AI 기반 해외 시장 분석 및 바이어 발굴 자동화")
 st.markdown("수출할 제품 정보와 타겟 국가를 입력하면, AI가 타겟 바이어 프로필을 분석하고 맞춤형 영문 콜드메일 초안을 작성합니다.")
 
-# 1. 엘리스 서버리스 API 및 클라이언트 설정 (st.secrets 사용)
-# st.secrets에 등록된 엘리스 전용 엔드포인트와 Serverless API 키를 불러옵니다.
+# 1. 기존에 시크릿에 등록하신 이름(MONOGPT_) 그대로 불러오기
 client = OpenAI(
-    base_url=st.secrets["ELICE_BASE_URL"],
-    api_key=st.secrets["ELICE_API_KEY"]
+    base_url=st.secrets["MONOGPT_BASE_URL"],
+    api_key=st.secrets["MONOGPT_API_KEY"]
 )
-# 엘리스에서 지원하는 모델명으로 변경 (gpt-6-luna)
 MODEL_NAME = "gpt-6-luna"
+
+# (이하 탭 레이아웃 및 분석/메일 생성 로직 코드는 그대로 유지)
 
 # 2. 화면 레이아웃 구성
 tab1, tab2 = st.tabs(["🎯 바이어 타겟팅 & 전략 분석", "✉️ 맞춤형 영문 콜드메일 생성"])
