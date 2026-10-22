@@ -113,7 +113,7 @@
 
     <section class="section section--muted" id="faq" aria-labelledby="faq-title"><div class="container"><div class="section-heading reveal"><p class="eyebrow">Questions, answered</p><h2 id="faq-title">시작하기 전에<br>확인해 보세요.</h2><p>지원 범위와 실제 연동 여부를 명확히 안내합니다.</p></div><div class="faq-list"><div class="accordion-item reveal"><button class="accordion-trigger" type="button" aria-expanded="false" aria-controls="faq-1">수출 경험이 없는 기업도 이용할 수 있나요?</button><div class="accordion-panel" id="faq-1">네. 제품과 목표 시장, 현재 준비 단계부터 확인해 필요한 업무를 나누어 상담합니다. 초기 기업은 모든 기능을 한 번에 도입하기보다 우선순위를 정해 시작할 수 있습니다.</div></div><div class="accordion-item reveal"><button class="accordion-trigger" type="button" aria-expanded="false" aria-controls="faq-2">어떤 국가와 제품군을 지원하나요?</button><div class="accordion-panel" id="faq-2">지원 가능 범위는 제품 분류와 목표 국가에 따라 달라집니다. 상담 시 제품 정보와 진출 희망 국가를 알려주시면 확인 가능한 범위와 추가 검토가 필요한 내용을 구분해 안내합니다.</div></div><div class="accordion-item reveal"><button class="accordion-trigger" type="button" aria-expanded="false" aria-controls="faq-3">바이어 발굴 후 실제 컨택도 지원하나요?</button><div class="accordion-panel" id="faq-3">플랜과 협의된 범위에 따라 영문 메시지 초안, 컨택 지원 또는 커뮤니케이션 대행을 검토할 수 있습니다. 실제 이메일 자동 발송 API가 연결되지 않은 경우 자동 발송 완료로 표시하지 않습니다.</div></div><div class="accordion-item reveal"><button class="accordion-trigger" type="button" aria-expanded="false" aria-controls="faq-4">규제 검토 결과가 공식 인증이나 통관을 보장하나요?</button><div class="accordion-panel" id="faq-4">아닙니다. 제공되는 검토는 공식 출처를 기반으로 확인 항목을 정리하는 지원이며, 법률 자문·공식 인증·통관 승인을 보장하지 않습니다. 최종 판단은 해당 국가의 공식 기관과 전문 자문을 통해 확인해야 합니다.</div></div><div class="accordion-item reveal"><button class="accordion-trigger" type="button" aria-expanded="false" aria-controls="faq-5">서비스 이용료 외에 추가 비용이 있나요?</button><div class="accordion-panel" id="faq-5">외부 데이터, 번역, 운송, 인증, 광고 등 별도 서비스가 필요한 경우 비용과 범위를 상담 과정에서 별도로 확인합니다. 확정되지 않은 비용은 사전에 단정하지 않습니다.</div></div><div class="accordion-item reveal"><button class="accordion-trigger" type="button" aria-expanded="false" aria-controls="faq-6">상담 신청 후 어떤 절차로 진행되나요?</button><div class="accordion-panel" id="faq-6">문의 내용을 확인한 뒤 제품·목표 시장·수출 단계에 대해 상담하고, 필요한 지원 범위와 다음 실행을 협의합니다. 상담 신청만으로 계약이나 비용이 발생하지는 않습니다.</div></div></div></div></section>
 
-    <!-- 405 에러 방지용 onsubmit 스크립트가 적용된 문의 폼 영역 -->
+    <!-- Formspree(https://formspree.io/f/mwlvgjoo)가 연동된 문의 폼 영역 -->
     <section class="contact-section section" id="contact" aria-labelledby="contact-title">
       <div class="container">
         <div class="contact-copy reveal">
@@ -126,7 +126,7 @@
           </div>
         </div>
         
-        <form class="contact-form reveal" data-contact-form onsubmit="event.preventDefault(); alert('무료 상담 신청이 정상적으로 접수되었습니다. 확인 후 연락드리겠습니다.'); location.reload();">
+        <form class="contact-form reveal" data-contact-form action="https://formspree.io/f/mwlvgjoo" method="POST">
           <div class="form-grid">
             <div class="field">
               <label for="name">이름 <span>*</span></label>
@@ -149,9 +149,9 @@
               <select id="service" name="service">
                 <option value="">선택해 주세요</option>
                 <option>바이어 발굴</option>
-                <option>시장조사</option>
+                <option>AI 아웃리치</option>
                 <option>규제 및 인증 검토</option>
-                <option>수출서류작성</option>
+                <option>물류 및 원가 계산</option>
                 <option>정부지원사업 큐레이션</option>
               </select>
             </div>
@@ -173,7 +173,7 @@
             <span>문의 응대를 위해 입력한 정보를 수집·이용하는 데 동의합니다. <a href="#footer">처리방침 안내</a>는 실제 운영 정책 확정 후 업데이트됩니다.</span>
           </label>
           <button class="btn btn--primary" type="submit">무료 상담 신청하기 <span>↗</span></button>
-          <p class="form-status" role="status">정적 데모에서는 알림 팝업으로 접수 완료를 안내합니다.</p>
+          <p class="form-status" role="status">상담 신청 시 Formspree를 통해 이메일이 안전하게 전송됩니다.</p>
         </form>
       </div>
     </section>
