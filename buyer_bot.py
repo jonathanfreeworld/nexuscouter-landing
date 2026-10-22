@@ -25,7 +25,6 @@ tab1, tab2 = st.tabs(["🎯 바이어 타겟팅 & 전략 분석", "✉️ 맞춤
 with tab1:
     st.subheader("🎯 해외 바이어 페르소나 및 시장 분석")
     
-    # 폼(form) 대신 일반 입력 필드와 버튼으로 변경하여 로딩 멈춤 방지
     item_name = st.text_input("수출 제품명 (또는 카테고리)", placeholder="예: 프리미엄 기능성 화장품 / 제약 원료", key="input_item_name")
     target_country = st.text_input("타겟 국가", placeholder="예: 인도, 베트남, 독일 등", key="input_target_country")
     buyer_type = st.selectbox("타겟 바이어 유형", ["현지 총판 디스트리뷰터 (Distributor)", "대형 수입/유통사 (Importer)", "B2B 이커머스 셀러", "현지 제조사 (OEM 파트너)"], key="input_buyer_type")
@@ -35,34 +34,34 @@ with tab1:
         if not item_name or not target_country:
             st.warning("수출 제품명과 타겟 국가를 모두 입력해 주세요!")
         else:
-            with st.spinner("AI가 글로벌 시장 트렌드와 타겟 바이어 성향을 분석 중입니다..."):
+            with st.spinner("AI가 글로벌 시장 트렌드와 타겟 바이어 성향을 분석 중입니다... (최대 1~2분 소요될 수 있습니다)"):
+                # 프롬프트를 핵심 위주로 명확하게 구성
                 prompt = (
-                    f"다음 제품의 해외 마케팅 및 바이어 발굴 전략을 세워줘:\n"
+                    f"다음 제품의 해외 마케팅 및 바이어 발굴 전략을 핵심 위주로 간결하게 요약해 줘:\n"
                     f"- 제품명: {item_name}\n"
                     f"- 타겟 국가: {target_country}\n"
                     f"- 타겟 바이어: {buyer_type}\n"
                     f"- 제품 강점: {key_strength}\n\n"
-                    f"1. 해당 국가의 현지 시장 동향 및 수요 분석\n"
-                    f"2. 이상적인 바이어 프로필 (어떤 기업을 타겟해야 하는지)\n"
-                    f"3. 바이어를 찾을 수 있는 주요 채널 및 플랫폼 (예: B2B 플랫폼, 현지 전시회 등)\n"
-                    f"4. 바이어 접근 핵심 전략을 구조화해서 작성해 줘."
+                    f"1. 현지 시장 동향 및 수요\n"
+                    f"2. 타겟 바이어 프로필\n"
+                    f"3. 주요 발굴 채널 및 플랫폼\n"
+                    f"4. 핵심 접근 전략"
                 )
                 
                 try:
-                    # API 호출 (타임아웃 45초 설정으로 무한 대기 방지)
+                    # 타임아웃을 90초로 넉넉하게 설정
                     response = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=[
-                            {"role": "system", "content": "너는 글로벌 무역 마케팅 전문가이자 B2B 해외 영업 디렉터야."},
+                            {"role": "system", "content": "너는 글로벌 무역 마케팅 전문가야. 핵심만 구조화해서 명확하게 답변해."},
                             {"role": "user", "content": prompt}
                         ],
-                        timeout=45.0
+                        timeout=90.0
                     )
                     st.session_state.market_result = response.choices[0].message.content
                 except Exception as e:
                     st.error(f"분석 중 오류 발생: {e}")
 
-    # 결과가 존재하면 화면에 출력
     if st.session_state.market_result:
         st.success("시장 분석 및 바이어 발굴 전략이 수립되었습니다!")
         st.markdown(st.session_state.market_result)
