@@ -6,12 +6,14 @@ st.set_page_config(page_title="AI 해외 마케팅 및 바이어 발굴 어드�
 st.title("🌐 AI 기반 해외 시장 분석 및 바이어 발굴 자동화")
 st.markdown("수출할 제품 정보와 타겟 국가를 입력하면, AI가 타겟 바이어 프로필을 분석하고 맞춤형 영문 콜드메일 초안을 작성합니다.")
 
-# 1. API 및 클라이언트 설정
+# 1. API 및 클라이언트 설정 (st.secrets 사용)
 client = OpenAI(
-    base_url="https://monogpt.kr/api/monorouter/v1/",
-    api_key="mr_universal_Ab7G-zuqo9-ZU-X3f9mUsPxF-HuqcvVv"
+    base_url=st.secrets["MONOGPT_BASE_URL"],
+    api_key=st.secrets["MONOGPT_API_KEY"]
 )
 MODEL_NAME = "gpt-5.6-terra"
+
+# (이하 기존 코드와 동일)
 
 # 2. 화면 레이아웃 구성
 tab1, tab2 = st.tabs(["🎯 바이어 타겟팅 & 전략 분석", "✉️ 맞춤형 영문 콜드메일 생성"])
