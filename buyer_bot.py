@@ -6,14 +6,14 @@ st.set_page_config(page_title="AI 해외 마케팅 및 바이어 발굴 어드�
 st.title("🌐 AI 기반 해외 시장 분석 및 바이어 발굴 자동화")
 st.markdown("수출할 제품 정보와 타겟 국가를 입력하면, AI가 타겟 바이어 프로필을 분석하고 맞춤형 영문 콜드메일 초안을 작성합니다.")
 
-# 1. API 및 클라이언트 설정 (st.secrets 사용)
+# 1. 엘리스 서버리스 API 및 클라이언트 설정 (st.secrets 사용)
+# st.secrets에 등록된 엘리스 전용 엔드포인트와 Serverless API 키를 불러옵니다.
 client = OpenAI(
-    base_url=st.secrets["MONOGPT_BASE_URL"],
-    api_key=st.secrets["MONOGPT_API_KEY"]
+    base_url=st.secrets["ELICE_BASE_URL"],
+    api_key=st.secrets["ELICE_API_KEY"]
 )
-MODEL_NAME = "gpt-5.6-terra"
-
-# (이하 기존 코드와 동일)
+# 엘리스에서 지원하는 모델명으로 변경 (gpt-6-luna)
+MODEL_NAME = "gpt-6-luna"
 
 # 2. 화면 레이아웃 구성
 tab1, tab2 = st.tabs(["🎯 바이어 타겟팅 & 전략 분석", "✉️ 맞춤형 영문 콜드메일 생성"])
@@ -47,13 +47,13 @@ with tab1:
                 )
                 
                 try:
+                    # 엘리스 모델은 temperature를 지원하지 않거나 기본값(1)만 지원하므로 매개변수 제거
                     response = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=[
                             {"role": "system", "content": "너는 글로벌 무역 마케팅 전문가이자 B2B 해외 영업 디렉터야."},
                             {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.3
+                        ]
                     )
                     st.success("시장 분석 및 바이어 발굴 전략이 수립되었습니다!")
                     st.markdown(response.choices[0].message.content)
@@ -90,17 +90,16 @@ with tab2:
                 )
                 
                 try:
+                    # 스트리밍 응답에서도 temperature 매개변수 제거
                     stream_response = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=[
                             {"role": "system", "content": "너는 글로벌 수출 영업 20년 경력의 수석 매니저야. 바이어 응답률이 높은 전문 비즈니스 영문 메일을 작성해."},
                             {"role": "user", "content": mail_prompt}
                         ],
-                        temperature=0.4,
                         stream=True
                     )
                     st.success("영문 콜드메일 초안이 완성되었습니다!")
                     st.write_stream(stream_response)
                 except Exception as e:
                     st.error(f"메일 생성 중 오류 발생: {e}")
-                    
