@@ -6,14 +6,18 @@ st.set_page_config(page_title="AI 해외 마케팅 및 바이어 발굴 어드�
 st.title("🌐 AI 기반 해외 시장 분석 및 바이어 발굴 자동화")
 st.markdown("수출할 제품 정보와 타겟 국가를 입력하면, AI가 타겟 바이어 프로필을 분석하고 맞춤형 영문 콜드메일 초안을 작성합니다.")
 
-# 1. 기존에 시크릿에 등록하신 이름(MONOGPT_) 그대로 불러오기
+# 1. 클라이언트 설정
 client = OpenAI(
     base_url=st.secrets["MONOGPT_BASE_URL"],
     api_key=st.secrets["MONOGPT_API_KEY"]
 )
 MODEL_NAME = "gpt-6-luna"
 
-# (이하 탭 레이아웃 및 분석/메일 생성 로직 코드는 그대로 유지)
+# 세션 상태 초기화
+if "market_result" not in st.session_state:
+    st.session_state.market_result = None
+if "mail_result" not in st.session_state:
+    st.session_state.mail_result = None
 
 # 2. 화면 레이아웃 구성
 tab1, tab2 = st.tabs(["🎯 바이어 타겟팅 & 전략 분석", "✉️ 맞춤형 영문 콜드메일 생성"])
@@ -47,7 +51,6 @@ with tab1:
                 )
                 
                 try:
-                    # 엘리스 모델은 temperature를 지원하지 않거나 기본값(1)만 지원하므로 매개변수 제거
                     response = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=[
@@ -55,10 +58,15 @@ with tab1:
                             {"role": "user", "content": prompt}
                         ]
                     )
-                    st.success("시장 분석 및 바이어 발굴 전략이 수립되었습니다!")
-                    st.markdown(response.choices[0].message.content)
+                    # 결과를 세션에 저장
+                    st.session_state.market_result = response.choices[0].message.content
                 except Exception as e:
                     st.error(f"분석 중 오류 발생: {e}")
+
+    # 폼 바깥쪽에 결과를 출력하여 유지되도록 함
+    if st.session_state.market_result:
+        st.success("시장 분석 및 바이어 발굴 전략이 수립되었습니다!")
+        st.markdown(st.session_state.market_result)
 
 with tab2:
     st.subheader("✉️ 바이어 맞춤형 영문 콜드메일(Cold Mail) 자동 생성")
@@ -90,16 +98,18 @@ with tab2:
                 )
                 
                 try:
-                    # 스트리밍 응답에서도 temperature 매개변수 제거
-                    stream_response = client.chat.completions.create(
+                    response = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=[
                             {"role": "system", "content": "너는 글로벌 수출 영업 20년 경력의 수석 매니저야. 바이어 응답률이 높은 전문 비즈니스 영문 메일을 작성해."},
                             {"role": "user", "content": mail_prompt}
-                        ],
-                        stream=True
+                        ]
                     )
-                    st.success("영문 콜드메일 초안이 완성되었습니다!")
-                    st.write_stream(stream_response)
+                    st.session_state.mail_result = response.choices[0].message.content
                 except Exception as e:
                     st.error(f"메일 생성 중 오류 발생: {e}")
+
+    # 폼 바깥쪽에 결과 출력
+    if st.session_state.mail_result:
+        st.success("영문 콜드메일 초안이 완성되었습니다!")
+        st.markdown(st.session_state.mail_result)
