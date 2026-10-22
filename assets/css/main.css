@@ -200,3 +200,58 @@ img, svg { max-width: 100%; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Container intake simulator */
+.tool-panel--wide { grid-template-columns: .78fr 1.22fr; align-items: start; }
+.tool-card--wide { padding: 27px; }
+.tool-card-heading, .container-result-head, .container-result-title, .calc-summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.tool-card-heading h3 { margin: 0; }
+.unit-note, .container-result-head span, .container-result-title span { color: var(--faint); font-size: 10px; }
+.sub-calculator { padding-top: 18px; margin-top: 18px; border-top: 1px solid var(--line); }
+.sub-calculator h4, .container-result-head h4 { margin: 0 0 14px; color: var(--ink); font-size: 13px; }
+.calc-grid--six { grid-template-columns: repeat(3, 1fr); }
+.calc-field--full { grid-column: 1 / -1; }
+.calc-summary { margin-top: 17px; padding: 14px; border: 1px solid #dbeafe; border-radius: 10px; background: var(--surface-2); }
+.calc-summary div { display: grid; gap: 3px; }
+.calc-summary span { color: var(--muted); font-size: 10px; }
+.calc-summary strong { color: var(--blue); font-size: 18px; letter-spacing: -.04em; }
+.container-results { margin-top: 22px; padding-top: 19px; border-top: 1px solid var(--line); }
+.container-result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.container-result { padding: 14px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.container-result--featured { border-color: #93c5fd; background: linear-gradient(155deg, #eff6ff, #fff); }
+.container-result-title strong { color: var(--ink); font-size: 14px; }
+.container-result-main { display: grid; gap: 1px; margin: 18px 0 14px; }
+.container-result-main strong { color: var(--blue); font-size: 22px; letter-spacing: -.06em; }
+.container-result-main span, .container-result-meta, .container-result small { color: var(--muted); font-size: 10px; }
+.container-result-meta { display: grid; gap: 5px; padding-top: 10px; border-top: 1px solid var(--line); }
+.container-result-meta b { float: right; color: var(--ink); font-weight: 800; }
+.container-result small { display: block; min-height: 28px; margin-top: 10px; color: var(--faint); line-height: 1.4; }
+@media (max-width: 1020px) { .tool-panel--wide { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .tool-card-heading, .container-result-head { align-items: flex-start; flex-direction: column; gap: 5px; }.calc-grid--six { grid-template-columns: 1fr 1fr; }.container-result-grid { grid-template-columns: 1fr; }.container-result { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }.container-result-title { grid-column: 1 / -1; }.container-result-main { margin: 12px 0; }.container-result-meta { padding-top: 0; border-top: 0; }.container-result small { grid-column: 1 / -1; } }
+
+/* Multi-SKU pallet planning */
+.sku-grid { display: grid; gap: 7px; }
+.sku-row { display: grid; grid-template-columns: 58px repeat(4, minmax(0, 1fr)); gap: 7px; align-items: center; }
+.sku-row--head { color: var(--faint); font-size: 9px; font-weight: 800; letter-spacing: .03em; text-align: center; }
+.sku-row--head span:first-child { text-align: left; }
+.sku-row strong { color: var(--ink); font-size: 11px; }
+.sku-row input { width: 100%; min-width: 0; padding: 9px 7px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--surface-2); font-size: 12px; }
+.sku-row input:focus { border-color: var(--blue); outline: 0; }
+.sku-result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.sku-result { display: grid; gap: 4px; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.sku-result > strong { color: var(--ink); font-size: 13px; }
+.sku-result > span { min-height: 27px; color: var(--faint); font-size: 9px; line-height: 1.35; }
+.sku-result > b { color: var(--blue); font-size: 19px; letter-spacing: -.05em; }
+.sku-result > small { color: var(--muted); font-size: 9px; }
+.sku-result > em { min-height: 16px; color: var(--faint); font-size: 9px; font-style: normal; }
+[data-total-boxes-input] { opacity: .7; }
+.container-result small + small { margin-top: 3px; }
+@media (max-width: 620px) { .sku-row { grid-template-columns: 48px repeat(2, minmax(0, 1fr)); }.sku-row--head span:nth-child(n+4), .sku-row input:nth-of-type(n+3) { display: none; }.sku-row::after { content: '수량은 아래 SKU 결과에서 확인'; grid-column: 2 / -1; color: var(--faint); font-size: 9px; }.sku-result-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 620px) {
+  .sku-grid { overflow-x: auto; padding-bottom: 4px; }
+  .sku-row { min-width: 520px; grid-template-columns: 58px repeat(4, minmax(85px, 1fr)); }
+  .sku-row--head span:nth-child(n+4), .sku-row input:nth-of-type(n+3) { display: block; }
+  .sku-row::after { content: none; }
+}
+.calc-readout { display: flex; align-items: center; min-height: 38px; padding: 9px 11px; border: 1px solid #dbeafe; border-radius: 7px; color: var(--blue); background: var(--surface-2); font-size: 14px; font-weight: 800; }
