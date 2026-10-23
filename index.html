@@ -16,10 +16,10 @@
       <a class="brand" href="#top" aria-label="nexuscouter 홈"><span class="brand-mark" aria-hidden="true"></span>nexuscouter</a>
       <nav class="nav-links" aria-label="주요 메뉴">
         <a href="#services">서비스</a>
+        <a href="#advisor-section">AI 어드바이저</a>
         <a href="#process">이용 프로세스</a>
         <a href="#pricing">요금제</a>
         <a href="#faq">FAQ</a>
-        <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
         <a class="nav-cta" href="#contact">무료 상담 신청</a>
       </nav>
       <button class="menu-toggle" type="button" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
@@ -37,7 +37,7 @@
             <a class="btn btn--primary" href="#contact">무료 상담 신청 <span aria-hidden="true">↗</span></a>
             <a class="btn btn--ghost" href="#services">서비스 살펴보기 <span aria-hidden="true">→</span></a>
             <a class="btn btn--advisor" href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer" style="border: 2px solid #2563eb; background-color: #ffffff; color: #2563eb; font-weight: 600; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); transition: all 0.2s ease;">
-              AI 해외마케팅 어드바이저 실행하기 <span aria-hidden="true">↗</span>
+              AI 해외마케팅 어드바이저 새창으로 실행하기 <span aria-hidden="true">↗</span>
             </a>
           </div>
           <div class="trust-row" aria-label="핵심 가치">
@@ -64,7 +64,21 @@
       </div>
     </section>
 
-    <section class="section section--muted" aria-labelledby="problem-title">
+    <!-- Streamlit AI 어드바이저 임베드 영역 -->
+    <section class="section section--muted" id="advisor-section" aria-labelledby="advisor-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Interactive AI Advisor</p>
+          <h2 id="advisor-title">AI 해외마케팅 어드바이저</h2>
+          <p>웹사이트 내에서 바로 AI 어드바이저와 소통하며 수출 전략을 수립하세요.</p>
+        </div>
+        <div class="reveal" style="width: 100%; height: 800px; border-radius: 12px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); background: #ffffff;">
+          <iframe src="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/?embed=true" style="width: 100%; height: 100%; border: none;" title="AI 어드바이저 앱"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="problem-title">
       <div class="container">
         <div class="section-heading reveal"><p class="eyebrow">The export gap</p><h2 id="problem-title">수출의 모든 단계,<br>더 이상 혼자 해결하지 마세요.</h2><p>해외 진출의 병목을 업무 단위로 나누고, 확인해야 할 정보와 다음 액션을 한눈에 정리합니다.</p></div>
         <div class="problem-grid">
@@ -75,7 +89,7 @@
       </div>
     </section>
 
-    <section class="section" id="services" aria-labelledby="services-title">
+    <section class="section section--muted" id="services" aria-labelledby="services-title">
       <div class="container">
         <div class="section-heading reveal"><p class="eyebrow">One connected workflow</p><h2 id="services-title">수출 실무를 움직이는<br>5가지 핵심 서비스.</h2><p>확인되지 않은 자동화를 약속하는 대신, 기업의 현재 단계에서 필요한 정보와 실행을 함께 설계합니다.</p></div>
         <div class="service-grid">
@@ -89,7 +103,47 @@
       </div>
     </section>
 
-    <!-- (물류 시뮬레이터 계산기 영역 삭제 완료) -->
+    <!-- 요청하신 CBM 참고 계산 영역 (복잡한 컨테이너 적재 시뮬레이터 제외) -->
+    <section class="section" aria-labelledby="tool-title">
+      <div class="container tool-panel tool-panel--wide">
+        <div class="tool-copy reveal">
+          <p class="eyebrow">Quick calculator</p>
+          <h2 id="tool-title">간편 CBM 계산기</h2>
+          <p>박스 규격과 수량을 입력하여 대략적인 부피(CBM)를 간편하게 확인하실 수 있습니다.</p>
+        </div>
+        <div class="tool-card tool-card--wide reveal">
+          <div class="tool-card-heading">
+            <h3>부피 참고 계산</h3>
+            <span class="unit-note">단위: mm / 박스</span>
+          </div>
+          <div class="sub-calculator" style="margin-top: 0;">
+            <div class="calc-grid">
+              <div class="calc-field">
+                <label for="calc-length">박스 길이</label>
+                <input id="calc-length" data-cbm-input type="number" min="0" value="400">
+              </div>
+              <div class="calc-field">
+                <label for="calc-width">박스 너비</label>
+                <input id="calc-width" data-cbm-input type="number" min="0" value="300">
+              </div>
+              <div class="calc-field">
+                <label for="calc-height">박스 높이</label>
+                <input id="calc-height" data-cbm-input type="number" min="0" value="250">
+              </div>
+              <div class="calc-field">
+                <label for="calc-quantity">박스 수량</label>
+                <input id="calc-quantity" data-cbm-input type="number" min="0" value="20">
+              </div>
+            </div>
+            <div class="calc-result" style="margin-top: 1rem;">
+              <span>참고 부피</span>
+              <strong data-cbm-output>0.600 CBM</strong>
+            </div>
+            <p class="calc-footnote" style="margin-top: 0.5rem;">CBM은 물류 견적 및 참고용으로만 활용됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="process section section--navy" id="process" aria-labelledby="process-title">
       <div class="container"><div class="section-heading reveal"><p class="eyebrow">How we work</p><h2 id="process-title">상담부터 실행까지,<br>명확한 4단계.</h2><p>현재의 수출 단계와 목표 시장을 확인한 뒤, 합의된 범위 안에서 다음 액션을 설계합니다.</p></div><div class="process-grid"><article class="process-step reveal"><div class="process-dot">01</div><h3>무료 상담</h3><p>제품, 목표 국가, 수출 단계와 현재 고민을 파악합니다.</p></article><article class="process-step reveal"><div class="process-dot">02</div><h3>맞춤 전략 설계</h3><p>제품과 시장에 맞는 바이어 발굴 및 지원 범위를 정의합니다.</p></article><article class="process-step reveal"><div class="process-dot">03</div><h3>데이터 기반 실행</h3><p>합의된 범위에 따라 탐색, 아웃리치, 규제 검토 및 실무 지원을 진행합니다.</p></article><article class="process-step reveal"><div class="process-dot">04</div><h3>결과 공유 및 후속 관리</h3><p>확인된 정보와 진행 현황을 공유하고 다음 방향을 논의합니다.</p></article></div></div>
@@ -176,6 +230,7 @@
         </div>
         <nav class="footer-links" aria-label="푸터 메뉴">
           <a href="#services">서비스</a>
+          <a href="#advisor-section">AI 어드바이저</a>
           <a href="#process">프로세스</a>
           <a href="#pricing">요금제</a>
           <a href="#faq">FAQ</a>
