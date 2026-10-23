@@ -71,48 +71,36 @@ with tab1:
             " 누락되었습니다."
         )
       else:
-        with st.spinner(
-            f"[{target_country}] 추론 및 진출 전략을 생성 중입니다..."
-        ):
-          try:
-            client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+        st.info(f"[{target_country}] 진출 전략을 실시간 생성 중입니다...")
+        try:
+          client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
-            prompt = (
-                f"수출 제품: {product_name} / 타겟 국가: {target_country} /"
-                f" 바이어 유형: {target_type} / 강점: {product_strength}\n위"
-                " 조건을 바탕으로 핵심 바이어 타겟팅 및 수출 진출 전략을"
-                " 마크다운으로 작성해 주세요."
-            )
+          prompt = (
+              f"수출 제품: {product_name} / 타겟 국가: {target_country} /"
+              f" 바이어 유형: {target_type} / 강점: {product_strength}\n위 조건을"
+              " 바탕으로 핵심 바이어 타겟팅 및 수출 진출 전략을 마크다운으로"
+              " 작성해 주세요."
+          )
 
-            # 프록시 최대 허용치인 2000 토큰으로 설정하여 사고 토큰과 출력 토큰을 모두 확보
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=2000,
-            )
+          # stream=True를 적용하여 프록시 제한 우회 및 실시간 출력
+          stream = client.chat.completions.create(
+              model=MODEL_NAME,
+              messages=[{"role": "user", "content": prompt}],
+              stream=True,
+          )
 
-            strategy_result = None
-            if response and response.choices:
-              msg = response.choices[0].message
-              if hasattr(msg, "content"):
-                strategy_result = msg.content
+          # 스트리밍 데이터를 화면에 실시간 렌더링
+          st.markdown("---")
+          st.write_stream(
+              chunk.choices[0].delta.content
+              for chunk in stream
+              if chunk.choices
+              and chunk.choices[0].delta
+              and chunk.choices[0].delta.content
+          )
 
-            if strategy_result and strategy_result.strip():
-              st.success("전략 분석이 완료되었습니다!")
-              st.markdown("---")
-              st.markdown(strategy_result)
-            else:
-              st.warning(
-                  "모델 출력이 비어 있습니다. 아래 원본 응답을 확인해 주세요."
-              )
-              st.json(
-                  response.model_dump()
-                  if hasattr(response, "model_dump")
-                  else str(response)
-              )
-
-          except Exception as e:
-            st.error(f"API 호출 중 오류가 발생했습니다: {e}")
+        except Exception as e:
+          st.error(f"API 호출 중 오류가 발생했습니다: {e}")
     else:
       st.warning("수출 제품명과 타겟 국가를 입력해 주세요.")
 
@@ -161,43 +149,31 @@ with tab2:
             " 누락되었습니다."
         )
       else:
-        with st.spinner("영문 콜드메일 초안을 작성 중입니다..."):
-          try:
-            client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-            mail_prompt = (
-                f"보내는 회사: {company_name} / 수신 바이어: {buyer_name} /"
-                f" 제안 품목: {item_content} / 톤앤매너: {tone_manner}\n위"
-                " 정보를 바탕으로 영문 콜드메일 초안(Subject 및 본문)을 작성해"
-                " 주세요."
-            )
+        st.info("영문 콜드메일 초안을 실시간 작성 중입니다...")
+        try:
+          client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+          mail_prompt = (
+              f"보내는 회사: {company_name} / 수신 바이어: {buyer_name} / 제안"
+              f" 품목: {item_content} / 톤앤매너: {tone_manner}\n위 정보를"
+              " 바탕으로 영문 콜드메일 초안(Subject 및 본문)을 작성해 주세요."
+          )
 
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[{"role": "user", "content": mail_prompt}],
-                max_completion_tokens=2000,
-            )
+          stream = client.chat.completions.create(
+              model=MODEL_NAME,
+              messages=[{"role": "user", "content": mail_prompt}],
+              stream=True,
+          )
 
-            mail_result = None
-            if response and response.choices:
-              msg = response.choices[0].message
-              if hasattr(msg, "content"):
-                mail_result = msg.content
+          st.markdown("---")
+          st.write_stream(
+              chunk.choices[0].delta.content
+              for chunk in stream
+              if chunk.choices
+              and chunk.choices[0].delta
+              and chunk.choices[0].delta.content
+          )
 
-            if mail_result and mail_result.strip():
-              st.success("콜드메일 초안이 생성되었습니다!")
-              st.markdown("---")
-              st.markdown(mail_result)
-            else:
-              st.warning(
-                  "모델 출력이 비어 있습니다. 아래 원본 응답을 확인해 주세요."
-              )
-              st.json(
-                  response.model_dump()
-                  if hasattr(response, "model_dump")
-                  else str(response)
-              )
-
-          except Exception as e:
-            st.error(f"API 호출 중 오류가 발생했습니다: {e}")
+        except Exception as e:
+          st.error(f"API 호출 중 오류가 발생했습니다: {e}")
     else:
       st.warning("필수 입력 항목을 모두 작성해 주세요.")
