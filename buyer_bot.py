@@ -71,6 +71,9 @@ with tab1:
             " 누락되었습니다."
         )
       else:
+        # 결과 출력을 확실히 담기 위한 컨테이너 영역 생성
+        result_container = st.container()
+
         with st.spinner(
             f"GPT-6 Luna가 {target_country} 시장을 심층 분석 중입니다..."
         ):
@@ -93,15 +96,24 @@ with tab1:
                         4. 구체적인 실행 액션 플랜 (Action Plan)
                         """
 
-            # temperature 파라미터를 제거하여 400 에러 해결
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": prompt}],
             )
 
+            # 응답 데이터 안전하게 추출
             strategy_result = response.choices[0].message.content
-            st.success("심층 분석이 완료되었습니다!")
-            st.markdown(strategy_result)
+
+            if strategy_result:
+              st.success("심층 분석이 완료되었습니다!")
+              # 결과를 화면에 명시적으로 출력
+              st.markdown("---")
+              st.markdown(strategy_result)
+            else:
+              st.warning(
+                  "API로부터 응답을 받았으나 내용이 비어 있습니다. 다시"
+                  " 시도해 주세요."
+              )
 
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
@@ -169,15 +181,22 @@ with tab2:
                         이메일 형식(Subject, Dear ~, 본문, Closing)을 갖춰 작성해 주세요.
                         """
 
-            # temperature 파라미터를 제거하여 400 에러 해결
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": mail_prompt}],
             )
 
             mail_result = response.choices[0].message.content
-            st.success("콜드메일 초안이 생성되었습니다!")
-            st.markdown(mail_result)
+
+            if mail_result:
+              st.success("콜드메일 초안이 생성되었습니다!")
+              st.markdown("---")
+              st.markdown(mail_result)
+            else:
+              st.warning(
+                  "API로부터 응답을 받았으나 내용이 비어 있습니다. 다시"
+                  " 시도해 주세요."
+              )
 
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
