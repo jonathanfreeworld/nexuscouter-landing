@@ -93,11 +93,11 @@ with tab1:
                         4. 구체적인 실행 액션 플랜 (Action Plan)
                         """
 
-            # max_completion_tokens를 4000으로 넉넉하게 지정하여 토큰 길이 초과(length 제한) 방지
+            # 프록시 제한(2000 토큰)에 맞춰 안전하게 1500 토큰으로 설정
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=4000,
+                max_completion_tokens=1500,
             )
 
             strategy_result = None
@@ -114,8 +114,8 @@ with tab1:
               st.markdown(strategy_result)
             else:
               st.warning(
-                  "모델이 사고(Reasoning) 과정에서 토큰을 모두 소모하여 출력이"
-                  " 비어 있습니다. 다시 시도해 주세요."
+                  "모델이 사고 과정에서 토큰을 모두 소모하여 출력이 비어"
+                  " 있습니다. 다시 시도해 주세요."
               )
 
           except Exception as e:
@@ -187,7 +187,7 @@ with tab2:
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": mail_prompt}],
-                max_completion_tokens=2000,
+                max_completion_tokens=1500,
             )
 
             mail_result = None
@@ -211,4 +211,4 @@ with tab2:
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
     else:
-      st.warning("수출 제품명과 타겟 국가를 입력해 주세요.")
+      st.warning("필수 입력 항목을 모두 작성해 주세요.")
