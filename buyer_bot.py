@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# 🔒 Streamlit Secrets에서 설정값 안전하게 불러오기
+# Streamlit Secrets에서 설정값 안전하게 불러오기
 try:
   API_BASE_URL = st.secrets["API_BASE_URL"]
   API_KEY = st.secrets["API_KEY"]
@@ -31,7 +31,6 @@ with tab1:
       " 분석 전략을 확인하세요."
   )
 
-  # 좌우 2열 컬럼 설정
   col1, col2 = st.columns(2)
 
   with col1:
@@ -76,7 +75,6 @@ with tab1:
             f"GPT-6 Luna가 {target_country} 시장을 심층 분석 중입니다..."
         ):
           try:
-            # 커스텀 엔드포인트 및 시크릿 키 적용 클라이언트 초기화
             client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
             prompt = f"""
@@ -95,10 +93,10 @@ with tab1:
                         4. 구체적인 실행 액션 플랜 (Action Plan)
                         """
 
+            # temperature 파라미터를 제거하여 400 에러 해결
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
             )
 
             strategy_result = response.choices[0].message.content
@@ -171,10 +169,10 @@ with tab2:
                         이메일 형식(Subject, Dear ~, 본문, Closing)을 갖춰 작성해 주세요.
                         """
 
+            # temperature 파라미터를 제거하여 400 에러 해결
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": mail_prompt}],
-                temperature=0.7,
             )
 
             mail_result = response.choices[0].message.content
