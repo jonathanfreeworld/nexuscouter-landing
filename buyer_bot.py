@@ -20,10 +20,8 @@ with tab1:
       " 확인하세요."
   )
 
-  # 모바일 화면 대응: 화면이 좁으면 자동으로 1열로 배치됩니다.
-  col1, col2 = st.columns(
-      [1, 1], spec=None, gap="medium"
-  )  # 모바일 친화적 컬럼
+  # 안전한 2열 컬럼 설정
+  col1, col2 = st.columns(2)
 
   with col1:
     product_name = st.text_input(
@@ -58,7 +56,6 @@ with tab1:
   if st.button("🚀 바이어 발굴 전략 분석 실행", key="btn_strategy"):
     if product_name and target_country:
       with st.spinner("AI가 타겟 시장과 페르소나를 분석 중입니다..."):
-        # 👉 실제 결과 데이터 생성 (예시)
         strategy_result = f"""
                 ---
                 ### 📊 [{target_country}] 바이어 타겟팅 및 진출 전략 결과
@@ -74,7 +71,6 @@ with tab1:
                 """
 
         st.success("분석이 완료되었습니다!")
-        # 👉 결과 화면 출력 코드 추가!
         st.markdown(strategy_result)
     else:
       st.warning("수출 제품명과 타겟 국가를 입력해 주세요.")
@@ -119,7 +115,6 @@ with tab2:
   if st.button("✨ 영문 제안 메일 생성하기", key="btn_mail"):
     if company_name and buyer_name and item_content:
       with st.spinner("맞춤형 영문 콜드메일을 작성 중입니다..."):
-        # 👉 실제 메일 초안 데이터 생성 (예시)
         mail_result = f"""
                 ---
                 ### 📝 생성된 영문 콜드메일 초안 ({tone_manner})
@@ -144,7 +139,6 @@ with tab2:
                 """
 
         st.success("콜드메일 초안이 생성되었습니다!")
-        # 👉 결과 화면 출력 코드 추가!
         st.markdown(mail_result)
     else:
       st.warning("필수 입력 항목을 모두 작성해 주세요.")
