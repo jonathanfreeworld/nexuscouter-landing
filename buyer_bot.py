@@ -71,9 +71,6 @@ with tab1:
             " 누락되었습니다."
         )
       else:
-        # 결과 출력을 확실히 담기 위한 컨테이너 영역 생성
-        result_container = st.container()
-
         with st.spinner(
             f"GPT-6 Luna가 {target_country} 시장을 심층 분석 중입니다..."
         ):
@@ -101,19 +98,28 @@ with tab1:
                 messages=[{"role": "user", "content": prompt}],
             )
 
-            # 응답 데이터 안전하게 추출
-            strategy_result = response.choices[0].message.content
+            # [디버깅용] API 응답 객체 전체 구조를 화면에 확인하기 위해 출력
+            # st.write("API 원본 응답:", response)
+
+            # 안전하게 텍스트 추출 시도 (다양한 구조 대응)
+            strategy_result = None
+            if response.choices and len(response.choices) > 0:
+              msg = response.choices[0].message
+              if hasattr(msg, "content") and msg.content:
+                strategy_result = msg.content
+              elif isinstance(msg, dict) and "content" in msg:
+                strategy_result = msg["content"]
 
             if strategy_result:
               st.success("심층 분석이 완료되었습니다!")
-              # 결과를 화면에 명시적으로 출력
               st.markdown("---")
               st.markdown(strategy_result)
             else:
               st.warning(
-                  "API로부터 응답을 받았으나 내용이 비어 있습니다. 다시"
-                  " 시도해 주세요."
+                  "API 응답 형식에서 텍스트를 추출할 수 없습니다. 아래 원본"
+                  " 응답 구조를 확인해 주세요."
               )
+              st.json(response.model_dump() if hasattr(response, "model_dump") else str(response))
 
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
@@ -186,7 +192,13 @@ with tab2:
                 messages=[{"role": "user", "content": mail_prompt}],
             )
 
-            mail_result = response.choices[0].message.content
+            mail_result = None
+            if response.choices and len(response.choices) > 0:
+              msg = response.choices[0].message
+              if hasattr(msg, "content") and msg.content:
+                mail_result = msg.content
+              elif isinstance(msg, dict) and "content" in msg:
+                mail_result = msg["content"]
 
             if mail_result:
               st.success("콜드메일 초안이 생성되었습니다!")
@@ -194,9 +206,10 @@ with tab2:
               st.markdown(mail_result)
             else:
               st.warning(
-                  "API로부터 응답을 받았으나 내용이 비어 있습니다. 다시"
-                  " 시도해 주세요."
+                  "API 응답 형식에서 텍스트를 추출할 수 없습니다. 원본"
+                  " 응답을 확인하세요."
               )
+              st.json(response.model_dump() if hasattr(response, "model_dump") else str(response))
 
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
