@@ -16,8 +16,8 @@
       <a class="brand" href="#top" aria-label="nexuscouter 홈"><span class="brand-mark" aria-hidden="true"></span>nexuscouter</a>
       <nav class="nav-links" aria-label="주요 메뉴">
         <a href="#services">서비스</a>
-        <a href="#advisor-section">AI 어드바이저</a>
-        <a href="#simulator-section">시뮬레이터</a>
+        <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
+        <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터</a>
         <a href="#process">이용 프로세스</a>
         <a href="#pricing">요금제</a>
         <a href="#faq">FAQ</a>
@@ -34,12 +34,19 @@
           <p class="eyebrow">Export intelligence, connected</p>
           <h1 id="hero-title">글로벌 수출의 복잡함, <em>AI로 더 단순하게.</em></h1>
           <p class="hero-lead">바이어 발굴부터 글로벌 규제 검증, 아웃리치와 수출 실무까지. nexuscouter가 데이터와 AI 자동화로 기업의 해외 진출을 지원합니다.</p>
-          <div class="hero-actions">
-            <a class="btn btn--primary" href="#contact">무료 상담 신청 <span aria-hidden="true">↗</span></a>
-            <a class="btn btn--ghost" href="#services">서비스 살펴보기 <span aria-hidden="true">→</span></a>
-            <a class="btn btn--advisor" href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer" style="border: 2px solid #2563eb; background-color: #ffffff; color: #2563eb; font-weight: 600; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); transition: all 0.2s ease;">
-              AI 해외마케팅 어드바이저 새창으로 실행 <span aria-hidden="true">↗</span>
-            </a>
+          <div class="hero-actions" style="display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start;">
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <a class="btn btn--primary" href="#contact">무료 상담 신청 <span aria-hidden="true">↗</span></a>
+              <a class="btn btn--ghost" href="#services">서비스 살펴보기 <span aria-hidden="true">→</span></a>
+            </div>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <a class="btn btn--advisor" href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer" style="border: 2px solid #2563eb; background-color: #ffffff; color: #2563eb; font-weight: 600; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                AI 해외마케팅 어드바이저 실행하기 <span aria-hidden="true">↗</span>
+              </a>
+              <a class="btn btn--simulator" href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer" style="border: 2px solid #0d9488; background-color: #ffffff; color: #0d9488; font-weight: 600; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                컨테이너 로딩 시뮬레이션 실행하기 <span aria-hidden="true">↗</span>
+              </a>
+            </div>
           </div>
           <div class="trust-row" aria-label="핵심 가치">
             <span>Data-driven Buyer Discovery</span>
@@ -61,34 +68,6 @@
             </div>
           </div>
           <div class="float-card"><div class="float-card-head"><small>Buyer profile · example</small><span class="score">92%</span></div><div class="float-line"><i>✓</i><div><strong>Fit signal</strong><span>Product / market match</span></div></div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 1. 기존 AI 어드바이저 앱 임베드 영역 -->
-    <section class="section section--muted" id="advisor-section" aria-labelledby="advisor-title">
-      <div class="container">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Interactive AI Advisor</p>
-          <h2 id="advisor-title">AI 해외마케팅 어드바이저</h2>
-          <p>웹사이트 내에서 바로 AI 어드바이저와 소통하며 수출 전략을 수립하세요.</p>
-        </div>
-        <div class="reveal" style="width: 100%; height: 800px; border-radius: 12px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); background: #ffffff;">
-          <iframe src="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/?embed=true" style="width: 100%; height: 100%; border: none;" title="AI 어드바이저 앱"></iframe>
-        </div>
-      </div>
-    </section>
-
-    <!-- 2. 새로 추가된 컨테이너 로딩 시뮬레이션 앱 임베드 영역 -->
-    <section class="section" id="simulator-section" aria-labelledby="simulator-title">
-      <div class="container">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Container Simulation</p>
-          <h2 id="simulator-title">컨테이너 로딩 시뮬레이션</h2>
-          <p>새롭게 추가된 물류 적재 시뮬레이터 앱을 통해 컨테이너 적재 상태를 직접 확인해 보세요.</p>
-        </div>
-        <div class="reveal" style="width: 100%; height: 800px; border-radius: 12px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); background: #ffffff;">
-          <iframe src="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/?embed=true" style="width: 100%; height: 100%; border: none;" title="컨테이너 로딩 시뮬레이션 앱"></iframe>
         </div>
       </div>
     </section>
@@ -245,8 +224,8 @@
         </div>
         <nav class="footer-links" aria-label="푸터 메뉴">
           <a href="#services">서비스</a>
-          <a href="#advisor-section">AI 어드바이저</a>
-          <a href="#simulator-section">시뮬레이터</a>
+          <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
+          <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터</a>
           <a href="#process">프로세스</a>
           <a href="#pricing">요금제</a>
           <a href="#faq">FAQ</a>
