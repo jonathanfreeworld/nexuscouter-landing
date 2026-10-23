@@ -27,8 +27,8 @@ tab1, tab2 = st.tabs(
 with tab1:
   st.markdown("### 🎯 해외 바이어 페르소나 및 시장 분석")
   st.write(
-      "해외 진출을 위한 타겟 시장과 바이어 조건을 설정하여 GPT-6 Luna의 심층"
-      " 분석 전략을 확인하세요."
+      "해외 진출을 위한 타겟 시장과 바이어 조건을 설정하여 맞춤형 전략을"
+      " 확인하세요."
   )
 
   col1, col2 = st.columns(2)
@@ -71,33 +71,24 @@ with tab1:
             " 누락되었습니다."
         )
       else:
-        with st.spinner(
-            f"GPT-6 Luna가 {target_country} 시장을 심층 분석 중입니다..."
-        ):
+        with st.spinner(f"[{target_country}] 진출 전략을 생성 중입니다..."):
           try:
             client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
+            # 불필요한 장문 유도 프롬프트를 간소화하여 토큰 소모를 방지합니다.
             prompt = f"""
-                        당신은 글로벌 B2B 수출 및 해외 마케팅 전문 AI 어드바이저입니다.
-                        다음 조건에 맞춰 전문적이고 구체적인 바이어 타겟팅 및 진출 전략 리포트를 마크다운 형식으로 작성해 주세요.
+                        수출 제품명: {product_name}
+                        타겟 국가: {target_country}
+                        타겟 바이어 유형: {target_type}
+                        제품 강점: {product_strength}
                         
-                        - 수출 제품명: {product_name}
-                        - 타겟 국가: {target_country}
-                        - 타겟 바이어 유형: {target_type}
-                        - 제품 강점: {product_strength}
-                        
-                        [포함할 내용]
-                        1. 현지 시장 특성 및 바이어 페르소나 분석
-                        2. 현지 파트너 발굴 및 접근 채널
-                        3. 제품 강점을 활용한 마케팅 소통 포인트
-                        4. 구체적인 실행 액션 플랜 (Action Plan)
+                        위 조건에 맞는 바이어 타겟팅 및 수출 진출 전략을 마크다운 형식으로 핵심 위주로 간결하게 작성해 주세요.
                         """
 
-            # 프록시 제한(2000 토큰)에 맞춰 안전하게 1500 토큰으로 설정
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=1500,
+                max_completion_tokens=1000,
             )
 
             strategy_result = None
@@ -109,14 +100,11 @@ with tab1:
                 strategy_result = msg["content"]
 
             if strategy_result:
-              st.success("심층 분석이 완료되었습니다!")
+              st.success("전략 분석이 완료되었습니다!")
               st.markdown("---")
               st.markdown(strategy_result)
             else:
-              st.warning(
-                  "모델이 사고 과정에서 토큰을 모두 소모하여 출력이 비어"
-                  " 있습니다. 다시 시도해 주세요."
-              )
+              st.warning("결과를 불러오지 못했습니다. 다시 시도해 주세요.")
 
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
@@ -127,8 +115,8 @@ with tab1:
 with tab2:
   st.markdown("### ✉️ 바이오 맞춤형 영문 콜드메일(Cold Mail) 자동 생성")
   st.write(
-      "발견한 바이어에게 보낼 매력적인 첫인상 영문 메일 초안을 GPT-6 Luna가"
-      " 자동으로 작성합니다."
+      "발견한 바이어에게 보낼 매력적인 첫인상 영문 메일 초안을 자동으로"
+      " 작성합니다."
   )
 
   col3, col4 = st.columns(2)
@@ -168,26 +156,22 @@ with tab2:
             " 누락되었습니다."
         )
       else:
-        with st.spinner(
-            "GPT-6 Luna가 맞춤형 영문 콜드메일을 작성 중입니다..."
-        ):
+        with st.spinner("영문 콜드메일 초안을 작성 중입니다..."):
           try:
             client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
             mail_prompt = f"""
-                        당신은 글로벌 수출 영업 전문가입니다. 해외 바이어에게 보낼 매력적인 영문 콜드메일 초안을 작성해 주세요.
+                        보내는 회사: {company_name}
+                        수신 바이어 회사: {buyer_name}
+                        제안 품목: {item_content}
+                        톤앤매너: {tone_manner}
                         
-                        - 보내는 회사: {company_name}
-                        - 수신 바이어 회사: {buyer_name}
-                        - 제안 품목: {item_content}
-                        - 톤앤매너: {tone_manner}
-                        
-                        이메일 형식(Subject, Dear ~, 본문, Closing)을 갖춰 작성해 주세요.
+                        위 정보를 바탕으로 바이어에게 보낼 영문 콜드메일 초안을 작성해 주세요. (Subject, 본문 포함)
                         """
 
             response = client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": mail_prompt}],
-                max_completion_tokens=1500,
+                max_completion_tokens=1000,
             )
 
             mail_result = None
@@ -203,10 +187,7 @@ with tab2:
               st.markdown("---")
               st.markdown(mail_result)
             else:
-              st.warning(
-                  "모델이 사고 과정에서 토큰을 모두 소모하여 출력이 비어"
-                  " 있습니다. 다시 시도해 주세요."
-              )
+              st.warning("결과를 불러오지 못했습니다. 다시 시도해 주세요.")
 
           except Exception as e:
             st.error(f"API 호출 중 오류가 발생했습니다: {e}")
