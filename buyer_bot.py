@@ -1,5 +1,8 @@
 from io import BytesIO
 import docx
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.shared import Pt
 import openai
 import streamlit as st
 
@@ -21,16 +24,52 @@ except Exception:
     MODEL_NAME = "gpt-6-luna"
 
 
-# 텍스트를 워드 파일 바이너리로 변환하는 함수
+# 텍스트를 한글 지원 폰트가 적용된 깔끔한 워드 파일로 변환하는 함수
 def create_word_document(title: str, content: str) -> bytes:
     doc = docx.Document()
+
+    # 1. 문서 전체의 기본 폰트를 '맑은 고딕'으로 설정 (한글 깨짐 방지)
+    style = doc.styles["Normal"]
+    font = style.font
+    font.name = "맑은 고딕"
+    font._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+    font.size = Pt(10.5)
+
     # 문서 제목 추가
-    doc.add_heading(title, level=1)
+    h = doc.add_heading(title, level=1)
+    for run in h.runs:
+        run.font.name = "맑은 고딕"
+        run._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+
     doc.add_paragraph("--------------------------------------------------")
 
-    # 내용 추가 (줄바꿈 반영)
-    for paragraph in content.split("\n"):
-        doc.add_paragraph(paragraph)
+    # 2. 마크다운 기호(#, **)를 일부 정리하면서 깔끔하게 워드 단락으로 추가
+    for line in content.split("\n"):
+        stripped = line.strip()
+        if not stripped:
+            doc.add_paragraph("")  # 빈 줄 추가
+            continue
+
+        # 마크다운 헤더(#) 처리
+        if stripped.startswith("### "):
+            p = doc.add_paragraph()
+            run = p.add_run(stripped.replace("### ", ""))
+            run.bold = True
+            run.font.size = Pt(13)
+        elif stripped.startswith("## "):
+            p = doc.add_paragraph()
+            run = p.add_run(stripped.replace("## ", ""))
+            run.bold = True
+            run.font.size = Pt(14)
+        elif stripped.startswith("# "):
+            p = doc.add_paragraph()
+            run = p.add_run(stripped.replace("# ", ""))
+            run.bold = True
+            run.font.size = Pt(15)
+        else:
+            # 일반 텍스트 내의 ** (볼드) 기호 제거 혹은 깔끔하게 출력
+            clean_line = stripped.replace("**", "")
+            doc.add_paragraph(clean_line)
 
     # 메모리 스트림에 저장
     output = BytesIO()
