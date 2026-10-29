@@ -5,7 +5,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.lib import colors
 import streamlit as st
 
 # 페이지 설정
@@ -26,7 +27,7 @@ except Exception:
     MODEL_NAME = "gpt-6-luna"
 
 
-# ReportLab을 이용해 안정적이고 깔끔한 PDF 바이너리로 변환하는 함수
+# 폰트 등록 및 PDF 생성 함수 (한글 깨짐 및 마크다운 기호 노출 방지)
 def create_pdf_document(title: str, content: str) -> bytes:
     output = BytesIO()
     doc = SimpleDocTemplate(
@@ -41,55 +42,88 @@ def create_pdf_document(title: str, content: str) -> bytes:
 
     styles = getSampleStyleSheet()
 
-    # 서버 환경에 맞는 한글 폰트(나눔고딕) 적용 시도
-    font_registered = False
+    # 리눅스 서버(Streamlit Cloud) 및 윈도우 환경별 한글 폰트 안전 등록
+    font_name = "Helvetica"  # 기본 영문 폰트 (폴백용)
+    
     try:
-        linux_font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
-        if os.path.exists(linux_font_path):
-            pdfmetrics.registerFont(TTFont("Malgun", linux_font_path))
-            font_registered = True
-        else:
-            win_font_path = "C:/Windows/Fonts/malgun.ttf"
-            if os.path.exists(win_font_path):
-                pdfmetrics.registerFont(TTFont("Malgun", win_font_path))
-                font_registered = True
+        # Streamlit Cloud (Ubuntu) 환경의 기본 한글 폰트 경로들
+        font_candidates = [
+            "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/noto/NotoSansKR-Regular.ttf",
+            "C:/Windows/Fonts/malgun.ttf"
+        ]
+        
+        for path in font_candidates:
+            if os.path.exists(path):
+                pdfmetrics.registerFont(TTFont("CustomKoreanFont", path))
+                font_name = "CustomKoreanFont"
+                break
     except Exception:
         pass
 
-    font_name = "Malgun" if font_registered else "Helvetica"
-
     title_style = ParagraphStyle(
-        "ReportTitle",
-        parent=styles["Heading1"],
+        'ReportTitle',
+        parent=styles['Heading1'],
         fontName=font_name,
         fontSize=16,
         leading=22,
-        textColor="#1E3A8A",
-        spaceAfter=15,
+        textColor=colors.HexColor('#1E3A8A'),
+        spaceAfter=15
+    )
+
+    h2_style = ParagraphStyle(
+        'ReportH2',
+        parent=styles['Heading2'],
+        fontName=font_name,
+        fontSize=13,
+        leading=18,
+        textColor=colors.HexColor('#2563EB'),
+        spaceBefore=12,
+        spaceAfter=6
     )
 
     body_style = ParagraphStyle(
-        "ReportBody",
-        parent=styles["Normal"],
+        'ReportBody',
+        parent=styles['Normal'],
         fontName=font_name,
         fontSize=10,
         leading=15,
-        textColor="#333333",
-        spaceAfter=8,
+        textColor=colors.HexColor('#333333'),
+        spaceAfter=6
     )
 
-    # 제목 추가
+    # 문서 제목 추가
     story.append(Paragraph(title, title_style))
     story.append(Spacer(1, 10))
 
-    # 본문 내용 추가 (줄바꿈 단위로 Paragraph 생성)
+    # 본문 마크다운 파싱 및 줄별 추가
     for line in content.split("\n"):
         stripped = line.strip()
         if not stripped:
-            story.append(Spacer(1, 8))
+            story.append(Spacer(1, 6))
             continue
-        clean_line = stripped.replace("**", "")
-        story.append(Paragraph(clean_line, body_style))
+
+        # 마크다운 헤더 기호 처리
+        if stripped.startswith("### "):
+            story.append(Paragraph(stripped.replace("### ", ""), h2_style))
+        elif stripped.startswith("## "):
+            story.append(Paragraph(stripped.replace("## ", ""), h2_style))
+        elif stripped.startswith("# "):
+            story.append(Paragraph(stripped.replace("# ", ""), title_style))
+        elif stripped.startswith("|"):
+            # 마크다운 표(|) 형태인 경우 구분선 및 텍스트 정돈
+            if "---" in stripped:
+                continue  # 표 구분선은 스킵
+            cols = [col.strip() for col in stripped.split("|") if col.strip()]
+            if cols:
+                table_text = " | ".join(cols)
+                story.append(Paragraph(f"• {table_text}", body_style))
+        else:
+            # 볼드체(**) 등 마크다운 태그 정돈
+            clean_line = stripped.replace("**", "<b>").replace("**", "</b>") # 간단 강조 처리
+            # ReportLab Paragraph에 맞게 특수문자나 태그 정리
+            story.append(Paragraph(clean_line, body_style))
 
     doc.build(story)
     return output.getvalue()
