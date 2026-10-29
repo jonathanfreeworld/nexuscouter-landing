@@ -1,10 +1,8 @@
 from io import BytesIO
-import docx
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
-from docx.shared import Pt
+import markdown
 import openai
 import streamlit as st
+from weasyprint import CSS, HTML
 
 # 페이지 설정
 st.set_page_config(
@@ -24,57 +22,86 @@ except Exception:
     MODEL_NAME = "gpt-6-luna"
 
 
-# 텍스트를 한글 지원 폰트가 적용된 깔끔한 워드 파일로 변환하는 함수
-def create_word_document(title: str, content: str) -> bytes:
-    doc = docx.Document()
+# 마크다운 텍스트를 한글 지원 폰트가 포함된 깔끔한 PDF 바이너리로 변환하는 함수
+def create_pdf_document(title: str, markdown_content: str) -> bytes:
+    # 1. 마크다운을 HTML로 변환 (표, 리스트, 볼드체 등 마크다운 문법 자동 파싱)
+    html_body = markdown.markdown(
+        markdown_content, extensions=["tables", "fenced_code"]
+    )
 
-    # 1. 문서 전체의 기본 폰트를 '맑은 고딕'으로 설정 (한글 깨짐 방지)
-    style = doc.styles["Normal"]
-    font = style.font
-    font.name = "맑은 고딕"
-    font._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
-    font.size = Pt(10.5)
+    # 2. 한글 깨짐 방지(맑은 고딕 / 나눔고딕) 및 전문적인 보고서 디자인 CSS 스타일 지정
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+            
+            body {{
+                font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+                color: #333333;
+                line-height: 1.6;
+                margin: 40px;
+                font-size: 11pt;
+            }}
+            h1 {{
+                font-size: 20pt;
+                color: #1E3A8A;
+                border-bottom: 2px solid #1E3A8A;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }}
+            h2 {{
+                font-size: 15pt;
+                color: #2563EB;
+                margin-top: 25px;
+                border-bottom: 1px solid #E5E7EB;
+                padding-bottom: 5px;
+            }}
+            h3 {{
+                font-size: 13pt;
+                color: #1F2937;
+                margin-top: 20px;
+            }}
+            p, li {{
+                font-size: 11pt;
+                margin-bottom: 8px;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }}
+            th, td {{
+                border: 1px solid #D1D5DB;
+                padding: 8px 12px;
+                text-align: left;
+                font-size: 10pt;
+            }}
+            th {{
+                background-color: #F3F4F6;
+                color: #1F2937;
+            }}
+            hr {{
+                border: none;
+                border-top: 1px solid #E5E7EB;
+                margin: 20px 0;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>{title}</h1>
+        {html_body}
+    </body>
+    </html>
+    """
 
-    # 문서 제목 추가
-    h = doc.add_heading(title, level=1)
-    for run in h.runs:
-        run.font.name = "맑은 고딕"
-        run._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
-
-    doc.add_paragraph("--------------------------------------------------")
-
-    # 2. 마크다운 기호(#, **)를 일부 정리하면서 깔끔하게 워드 단락으로 추가
-    for line in content.split("\n"):
-        stripped = line.strip()
-        if not stripped:
-            doc.add_paragraph("")  # 빈 줄 추가
-            continue
-
-        # 마크다운 헤더(#) 처리
-        if stripped.startswith("### "):
-            p = doc.add_paragraph()
-            run = p.add_run(stripped.replace("### ", ""))
-            run.bold = True
-            run.font.size = Pt(13)
-        elif stripped.startswith("## "):
-            p = doc.add_paragraph()
-            run = p.add_run(stripped.replace("## ", ""))
-            run.bold = True
-            run.font.size = Pt(14)
-        elif stripped.startswith("# "):
-            p = doc.add_paragraph()
-            run = p.add_run(stripped.replace("# ", ""))
-            run.bold = True
-            run.font.size = Pt(15)
-        else:
-            # 일반 텍스트 내의 ** (볼드) 기호 제거 혹은 깔끔하게 출력
-            clean_line = stripped.replace("**", "")
-            doc.add_paragraph(clean_line)
-
-    # 메모리 스트림에 저장
-    output = BytesIO()
-    doc.save(output)
-    return output.getvalue()
+    # 3. Weasyprint를 이용해 HTML을 PDF 바이트 스트림으로 컴파일
+    pdf_output = BytesIO()
+    HTML(string=html_content).write_pdf(pdf_output)
+    return pdf_output.getvalue()
 
 
 # 상단 탭 메뉴 구성
@@ -135,7 +162,7 @@ with tab1:
                     prompt = (
                         f"수출 제품: {product_name} / 타겟 국가: {target_country} / "
                         f"바이어 유형: {target_type} / 강점: {product_strength}\n위 조건을 "
-                        "바탕으로 핵심 바이어 타겟팅 및 수출 진출 전략을 마크다운으로 작성해 주세요."
+                        "바탕으로 핵심 바이어 타겟팅 및 수출 진출 전략을 마크다운 형식(표, 소제목 포함)으로 상세히 작성해 주세요."
                     )
 
                     stream = client.chat.completions.create(
@@ -166,18 +193,18 @@ with tab1:
         else:
             st.warning("수출 제품명과 타겟 국가를 입력해 주세요.")
 
-    # 워드 다운로드 버튼
+    # PDF 다운로드 버튼
     if "strategy_result" in st.session_state and st.session_state["strategy_result"]:
-        docx_data = create_word_document(
+        pdf_data = create_pdf_document(
             f"[{target_country}] 해외 바이어 발굴 및 진출 전략 보고서",
             st.session_state["strategy_result"],
         )
         st.download_button(
-            label="📥 해외 진출 전략 보고서 워드 다운로드 (.docx)",
-            data=docx_data,
-            file_name=f"export_strategy_{target_country or 'report'}.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            key="download_strategy_docx",
+            label="📥 해외 진출 전략 보고서 PDF 다운로드 (.pdf)",
+            data=pdf_data,
+            file_name=f"export_strategy_{target_country or 'report'}.pdf",
+            mime="application/pdf",
+            key="download_strategy_pdf",
         )
 
 # 2. 맞춤형 영문 콜드메일 생성 탭
@@ -229,7 +256,7 @@ with tab2:
                     mail_prompt = (
                         f"보내는 회사: {company_name} / 수신 바이어: {buyer_name} / 제안 "
                         f"품목: {item_content} / 톤앤매너: {tone_manner}\n위 정보를 "
-                        "바탕으로 영문 콜드메일 초안(Subject 및 본문)을 작성해 주세요."
+                        "바탕으로 영문 콜드메일 초안(Subject 및 본문)을 마크다운 형식으로 작성해 주세요."
                     )
 
                     stream = client.chat.completions.create(
@@ -260,16 +287,16 @@ with tab2:
         else:
             st.warning("필수 입력 항목을 모두 작성해 주세요.")
 
-    # 워드 다운로드 버튼
+    # PDF 다운로드 버튼
     if "mail_result" in st.session_state and st.session_state["mail_result"]:
-        docx_mail_data = create_word_document(
+        pdf_mail_data = create_pdf_document(
             f"[{buyer_name}] 영문 콜드메일 제안서",
             st.session_state["mail_result"],
         )
         st.download_button(
-            label="📥 영문 콜드메일 초안 워드 다운로드 (.docx)",
-            data=docx_mail_data,
-            file_name=f"cold_mail_{buyer_name or 'buyer'}.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            key="download_mail_docx",
+            label="📥 영문 콜드메일 초안 PDF 다운로드 (.pdf)",
+            data=pdf_mail_data,
+            file_name=f"cold_mail_{buyer_name or 'buyer'}.pdf",
+            mime="application/pdf",
+            key="download_mail_pdf",
         )
