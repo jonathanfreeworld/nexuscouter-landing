@@ -49,19 +49,19 @@ def create_pdf_document(title: str, content: str) -> bytes:
 
     try:
         # 본문용 (Medium)
-        if os.path.exists("kopub.ttf"):
-            pdfmetrics.registerFont(TTFont("KoPubMedium", "kopub.ttf"))
-            body_font = "KoPubMedium"
-        elif os.path.exists("KoPubWorld Dotum Medium.ttf"):
+        if os.path.exists("KoPubWorld Dotum Medium.ttf"):
             pdfmetrics.registerFont(TTFont("KoPubMedium", "KoPubWorld Dotum Medium.ttf"))
             body_font = "KoPubMedium"
+        elif os.path.exists("kopub.ttf"):
+            pdfmetrics.registerFont(TTFont("KoPubMedium", "kopub.ttf"))
+            body_font = "KoPubMedium"
 
-        # 제목용 (Bold) - 파일이 없으면 Medium으로 대체
+        # 제목용 (Bold)
         if os.path.exists("KoPubWorld Dotum Bold.ttf"):
             pdfmetrics.registerFont(TTFont("KoPubBold", "KoPubWorld Dotum Bold.ttf"))
             bold_font = "KoPubBold"
         else:
-            bold_font = body_font  # Bold 파일이 없으면 굵은 폰트를 Medium으로 대체
+            bold_font = body_font
     except Exception:
         pass
 
@@ -240,6 +240,10 @@ with tab2:
         "발견한 바이어에게 보낼 매력적인 첫인상 영문 메일 초안을 자동으로 작성합니다."
     )
 
+    # 이전 탭의 전략 분석 결과가 있다면 안내 문구 표시
+    if "strategy_result" in st.session_state and st.session_state["strategy_result"]:
+        st.success("💡 첫 번째 탭에서 생성된 **진출 전략 분석 보고서 내용이 콜드메일 생성에 자동으로 연동**됩니다!")
+
     col3, col4 = st.columns(2)
 
     with col3:
@@ -276,13 +280,17 @@ with tab2:
                     "⚠️ Streamlit Secrets에 API 설정(API_BASE_URL, API_KEY)이 누락되었습니다."
                 )
             else:
-                st.info("영문 콜드메일 초안을 실시간 작성 중입니다...")
+                st.info("이전 분석 보고서 내용을 참고하여 맞춤형 영문 콜드메일 초안을 작성 중입니다...")
                 try:
                     client = openai.OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+                    
+                    # 첫 번째 탭의 분석 결과 가져오기 (연동)
+                    strategy_context = st.session_state.get("strategy_result", "별도 분석 내용 없음")
+
                     mail_prompt = (
-                        f"보내는 회사: {company_name} / 수신 바이어: {buyer_name} / 제안 "
-                        f"품목: {item_content} / 톤앤매너: {tone_manner}\n위 정보를 "
-                        "바탕으로 영문 콜드메일 초안(Subject 및 본문)을 작성해 주세요."
+                        f"보내는 회사: {company_name} / 수신 바이어: {buyer_name} / 제안 품목: {item_content} / 톤앤매너: {tone_manner}\n\n"
+                        f"[참고할 이전 시장 분석 및 진출 전략 보고서 핵심 내용]:\n{strategy_context[:1200]}\n\n"
+                        "위의 시장 분석 내용과 전략적 소구점을 적극적으로 반영하여, 바이어의 마음을 사로잡을 수 있는 맞춤형 영문 콜드메일 초안(Subject 및 본문)을 작성해 주세요."
                     )
 
                     stream = client.chat.completions.create(
