@@ -28,7 +28,7 @@ except Exception:
     MODEL_NAME = "gpt-6-luna"
 
 
-# 맑은 고딕 폰트를 직접 로드하여 한글 깨짐을 방지하는 PDF 생성 함수
+# 제목과 본문의 폰트(Bold / Medium)를 분리하여 마크다운 위계를 살린 PDF 생성 함수
 def create_pdf_document(title: str, content: str) -> bytes:
     output = BytesIO()
     doc = SimpleDocTemplate(
@@ -43,28 +43,35 @@ def create_pdf_document(title: str, content: str) -> bytes:
 
     styles = getSampleStyleSheet()
 
-    # 업로드한 맑은 고딕(malgun.ttf) 폰트 안전 등록
-    font_name = "Helvetica"  # 기본 영문 폴백
+    # 코펍체(Medium, Bold) 폰트 안전 등록
+    body_font = "Helvetica"
+    bold_font = "Helvetica-Bold"
+
     try:
-        font_filename = "malgun.ttf"
-        if os.path.exists(font_filename):
-            pdfmetrics.registerFont(TTFont("MalgunKorean", font_filename))
-            font_name = "MalgunKorean"
+        # 본문용 (Medium)
+        if os.path.exists("kopub.ttf"):
+            pdfmetrics.registerFont(TTFont("KoPubMedium", "kopub.ttf"))
+            body_font = "KoPubMedium"
+        elif os.path.exists("KoPubWorld Dotum Medium.ttf"):
+            pdfmetrics.registerFont(TTFont("KoPubMedium", "KoPubWorld Dotum Medium.ttf"))
+            body_font = "KoPubMedium"
+
+        # 제목용 (Bold) - 파일이 없으면 Medium으로 대체
+        if os.path.exists("KoPubWorld Dotum Bold.ttf"):
+            pdfmetrics.registerFont(TTFont("KoPubBold", "KoPubWorld Dotum Bold.ttf"))
+            bold_font = "KoPubBold"
         else:
-            # 리눅스 시스템 기본 경로 체크
-            linux_font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
-            if os.path.exists(linux_font_path):
-                pdfmetrics.registerFont(TTFont("MalgunKorean", linux_font_path))
-                font_name = "MalgunKorean"
+            bold_font = body_font  # Bold 파일이 없으면 굵은 폰트를 Medium으로 대체
     except Exception:
         pass
 
+    # 스타일 정의 (제목과 본문의 폰트 및 크기 차별화)
     title_style = ParagraphStyle(
         'ReportTitle',
         parent=styles['Heading1'],
-        fontName=font_name,
-        fontSize=16,
-        leading=22,
+        fontName=bold_font,
+        fontSize=18,
+        leading=24,
         textColor=colors.HexColor('#1E3A8A'),
         spaceAfter=15
     )
@@ -72,18 +79,18 @@ def create_pdf_document(title: str, content: str) -> bytes:
     h2_style = ParagraphStyle(
         'ReportH2',
         parent=styles['Heading2'],
-        fontName=font_name,
+        fontName=bold_font,
         fontSize=13,
         leading=18,
         textColor=colors.HexColor('#2563EB'),
-        spaceBefore=12,
+        spaceBefore=14,
         spaceAfter=6
     )
 
     body_style = ParagraphStyle(
         'ReportBody',
         parent=styles['Normal'],
-        fontName=font_name,
+        fontName=body_font,
         fontSize=10,
         leading=15,
         textColor=colors.HexColor('#333333'),
@@ -95,7 +102,7 @@ def create_pdf_document(title: str, content: str) -> bytes:
     story.append(Paragraph(safe_title, title_style))
     story.append(Spacer(1, 10))
 
-    # 본문 마크다운 파싱 및 안전한 처리
+    # 본문 마크다운 파싱 및 위계별 스타일 적용
     for line in content.split("\n"):
         stripped = line.strip()
         if not stripped:
