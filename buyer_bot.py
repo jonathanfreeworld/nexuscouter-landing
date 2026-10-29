@@ -1,8 +1,13 @@
 from io import BytesIO
-import markdown
 import openai
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import RegisterFont, TTFont
 import streamlit as st
-from weasyprint import CSS, HTML
+import os
 
 # 페이지 설정
 st.set_page_config(
@@ -22,86 +27,71 @@ except Exception:
     MODEL_NAME = "gpt-6-luna"
 
 
-# 마크다운 텍스트를 한글 지원 폰트가 포함된 깔끔한 PDF 바이너리로 변환하는 함수
-def create_pdf_document(title: str, markdown_content: str) -> bytes:
-    # 1. 마크다운을 HTML로 변환 (표, 리스트, 볼드체 등 마크다운 문법 자동 파싱)
-    html_body = markdown.markdown(
-        markdown_content, extensions=["tables", "fenced_code"]
+# 텍스트를 ReportLab을 이용해 안전하고 깔끔한 PDF로 변환하는 함수
+def create_pdf_document(title: str, content: str) -> bytes:
+    output = BytesIO()
+    doc = SimpleDocTemplate(output, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+    story = []
+
+    # 기본 스타일 설정
+    styles = getSampleStyleSheet()
+    
+    # 맑은 고딕 폰트 등록 (리눅스 서버 기본 폰트 혹은 시스템 폰트 대체 처리)
+    font_registered = False
+    try:
+        # 윈도우/일반 환경용 경로 시도
+        font_path = "C:/Windows/Fonts/malgun.ttf"
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('Malgun', font_path))
+            font_registered = True
+        else:
+            # 리눅스 서버용 나눔고딕 등 대체 경로 시도
+            linux_font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
+            if os.path.exists(linux_font_path):
+                pdfmetrics.registerFont(TTFont('Malgun', linux_font_path))
+                font_registered = True
+    except Exception:
+        pass
+
+    # 사용할 폰트 지정 (등록 실패시 기본 폰트 사용)
+    font_name = 'Malgun' if font_registered else 'Helvetica'
+
+    title_style = ParagraphStyle(
+        'ReportTitle',
+        parent=styles['Heading1'],
+        fontName=font_name,
+        fontSize=16,
+        leading=22,
+        textColor=colors_hex := '#1E3A8A',
+        spaceAfter=15
     )
 
-    # 2. 한글 깨짐 방지(맑은 고딕 / 나눔고딕) 및 전문적인 보고서 디자인 CSS 스타일 지정
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
-            
-            body {{
-                font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-                color: #333333;
-                line-height: 1.6;
-                margin: 40px;
-                font-size: 11pt;
-            }}
-            h1 {{
-                font-size: 20pt;
-                color: #1E3A8A;
-                border-bottom: 2px solid #1E3A8A;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
-            }}
-            h2 {{
-                font-size: 15pt;
-                color: #2563EB;
-                margin-top: 25px;
-                border-bottom: 1px solid #E5E7EB;
-                padding-bottom: 5px;
-            }}
-            h3 {{
-                font-size: 13pt;
-                color: #1F2937;
-                margin-top: 20px;
-            }}
-            p, li {{
-                font-size: 11pt;
-                margin-bottom: 8px;
-            }}
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 15px;
-                margin-bottom: 15px;
-            }}
-            th, td {{
-                border: 1px solid #D1D5DB;
-                padding: 8px 12px;
-                text-align: left;
-                font-size: 10pt;
-            }}
-            th {{
-                background-color: #F3F4F6;
-                color: #1F2937;
-            }}
-            hr {{
-                border: none;
-                border-top: 1px solid #E5E7EB;
-                margin: 20px 0;
-            }}
-        </style>
-    </head>
-    <body>
-        <h1>{title}</h1>
-        {html_body}
-    </body>
-    </html>
-    """
+    body_style = ParagraphStyle(
+        'ReportBody',
+        parent=styles['Normal'],
+        fontName=font_name,
+        fontSize=10,
+        leading=15,
+        textColor='#333333',
+        spaceAfter=8
+    )
 
-    # 3. Weasyprint를 이용해 HTML을 PDF 바이트 스트림으로 컴파일
-    pdf_output = BytesIO()
-    HTML(string=html_content).write_pdf(pdf_output)
-    return pdf_output.getvalue()
+    # 제목 추가
+    story.append(Paragraph(title, title_style))
+    story.append(Spacer(1, 10))
+
+    # 본문 내용 추가 (줄바꿈 단위로 Paragraph 생성)
+    for line in content.split("\n"):
+        stripped = line.strip()
+        if not stripped:
+            story.append(Spacer(1, 8))
+            continue
+        # 마크다운 특수문자 일부 정돈
+        clean_line = stripped.replace("**", "")
+        story.append(Paragraph(clean_line, body_style))
+
+    doc.build(story)
+    return output.getvalue()
 
 
 # 상단 탭 메뉴 구성
@@ -162,7 +152,7 @@ with tab1:
                     prompt = (
                         f"수출 제품: {product_name} / 타겟 국가: {target_country} / "
                         f"바이어 유형: {target_type} / 강점: {product_strength}\n위 조건을 "
-                        "바탕으로 핵심 바이어 타겟팅 및 수출 진출 전략을 마크다운 형식(표, 소제목 포함)으로 상세히 작성해 주세요."
+                        "바탕으로 핵심 바이어 타겟팅 및 수출 진출 전략을 마크다운 형식으로 작성해 주세요."
                     )
 
                     stream = client.chat.completions.create(
@@ -256,7 +246,7 @@ with tab2:
                     mail_prompt = (
                         f"보내는 회사: {company_name} / 수신 바이어: {buyer_name} / 제안 "
                         f"품목: {item_content} / 톤앤매너: {tone_manner}\n위 정보를 "
-                        "바탕으로 영문 콜드메일 초안(Subject 및 본문)을 마크다운 형식으로 작성해 주세요."
+                        "바탕으로 영문 콜드메일 초안(Subject 및 본문)을 작성해 주세요."
                     )
 
                     stream = client.chat.completions.create(
