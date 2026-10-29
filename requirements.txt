@@ -6,4 +6,3 @@ pdfplumber
 python-docx
 markdown
 reportlab
-malgun.ttf
