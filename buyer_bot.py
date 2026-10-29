@@ -28,7 +28,7 @@ except Exception:
     MODEL_NAME = "gpt-6-luna"
 
 
-# 특수문자 및 마크다운 태그 충돌을 방지하도록 안전하게 정제하는 PDF 생성 함수
+# 맑은 고딕 폰트를 직접 로드하여 한글 깨짐을 방지하는 PDF 생성 함수
 def create_pdf_document(title: str, content: str) -> bytes:
     output = BytesIO()
     doc = SimpleDocTemplate(
@@ -43,21 +43,19 @@ def create_pdf_document(title: str, content: str) -> bytes:
 
     styles = getSampleStyleSheet()
 
-    # 리눅스 서버(Streamlit Cloud) 및 윈도우 환경별 한글 폰트 안전 등록
-    font_name = "Helvetica"  # 기본 영문 폰트 (폴백용)
+    # 업로드한 맑은 고딕(malgun.ttf) 폰트 안전 등록
+    font_name = "Helvetica"  # 기본 영문 폴백
     try:
-        font_candidates = [
-            "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
-            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-            "/usr/share/fonts/truetype/noto/NotoSansKR-Regular.ttf",
-            "C:/Windows/Fonts/malgun.ttf",
-        ]
-        
-        for path in font_candidates:
-            if os.path.exists(path):
-                pdfmetrics.registerFont(TTFont("CustomKoreanFont", path))
-                font_name = "CustomKoreanFont"
-                break
+        font_filename = "malgun.ttf"
+        if os.path.exists(font_filename):
+            pdfmetrics.registerFont(TTFont("MalgunKorean", font_filename))
+            font_name = "MalgunKorean"
+        else:
+            # 리눅스 시스템 기본 경로 체크
+            linux_font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
+            if os.path.exists(linux_font_path):
+                pdfmetrics.registerFont(TTFont("MalgunKorean", linux_font_path))
+                font_name = "MalgunKorean"
     except Exception:
         pass
 
@@ -92,7 +90,7 @@ def create_pdf_document(title: str, content: str) -> bytes:
         spaceAfter=6
     )
 
-    # 문서 제목 추가 (HTML 특수문자 이스케이프 처리)
+    # 문서 제목 추가
     safe_title = html.escape(title)
     story.append(Paragraph(safe_title, title_style))
     story.append(Spacer(1, 10))
@@ -104,10 +102,8 @@ def create_pdf_document(title: str, content: str) -> bytes:
             story.append(Spacer(1, 6))
             continue
 
-        # 마크다운 헤더 기호 처리
         if stripped.startswith("### ") or stripped.startswith("## ") or stripped.startswith("# "):
             header_text = stripped.lstrip("#").strip()
-            # 텍스트 내 HTML 태그 오인식 방지를 위한 escape 처리 후 볼드 적용
             safe_text = html.escape(header_text)
             story.append(Paragraph(f"<b>{safe_text}</b>", h2_style))
         elif stripped.startswith("|"):
@@ -119,13 +115,9 @@ def create_pdf_document(title: str, content: str) -> bytes:
                 safe_row = html.escape(row_text)
                 story.append(Paragraph(f"• {safe_row}", body_style))
         else:
-            # 일반 텍스트 내의 ** 볼드 처리 기호를 안전한 HTML 태그로 치환하되 기본 특수문자는 이스케이프
-            cleaned = stripped.replace("**", "@@@")
+            cleaned = stripped.replace("**", "")
             safe_text = html.escape(cleaned)
-            final_text = safe_text.replace("@@@<b>", "<b>").replace("@@@</b>", "</b>").replace("@@@", "<b>", 1).replace("@@@", "</b>", 1)
-            # 만약 볼드 매칭이 꼬일 경우를 대비해 ** 기호 자체를 제거하고 일반 텍스트로 안전하게 출력
-            final_text = safe_text.replace("@@@", "")
-            story.append(Paragraph(final_text, body_style))
+            story.append(Paragraph(safe_text, body_style))
 
     doc.build(story)
     return output.getvalue()
