@@ -1,9 +1,8 @@
-streamlit
-openai
+streamlit>=1.20.0
+openai>=1.0.0
 pandas
 openpyxl
 pdfplumber
-openai>=1.0.0
 python-docx
 markdown
-weasyprint
+reportlab
