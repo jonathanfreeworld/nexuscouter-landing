@@ -1,113 +1,90 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>nexuscouter | AI 기반 B2B 수출 자동화 및 글로벌 컴플라이언스</title>
-  <meta name="description" content="해외 바이어 발굴부터 AI 아웃리치, 글로벌 규제 검토, 수출 실무까지. nexuscouter와 함께 더 체계적으로 글로벌 시장에 진출하세요.">
-  <meta property="og:title" content="nexuscouter | AI 기반 B2B 수출 자동화 및 글로벌 컴플라이언스">
-  <meta property="og:description" content="데이터와 AI 자동화로 복잡한 글로벌 수출 업무를 더 단순하게.">
-  <link rel="stylesheet" href="assets/css/main.css">
-</head>
-<body>
-  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
-  <header class="site-header" id="top">
-    <div class="container nav-wrap">
-      <a class="brand" href="#top" aria-label="nexuscouter 홈"><span class="brand-mark" aria-hidden="true"></span>nexuscouter</a>
-      <nav class="nav-links" aria-label="주요 메뉴">
-        <a href="#services">서비스</a>
-        <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
-        <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터</a>
-        <!-- 👇 새로 추가된 앱 메뉴 -->
-        <a href="여기에_새로운_앱_주소_입력" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 600;">신규 AI 툴 ↗</a>
-        <a href="#process">이용 프로세스</a>
-        <a href="#pricing">요금제</a>
-        <a href="#faq">FAQ</a>
-        <a class="nav-cta" href="#contact">무료 상담 신청</a>
-      </nav>
-      <button class="menu-toggle" type="button" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
-    </div>
-  </header>
+import streamlit as st
+from chapters import CATEGORIES, CHAPTERS, DEADLINES
 
-  <main id="main">
-    <section class="hero section" aria-labelledby="hero-title">
-      <div class="container hero-grid">
-        <div class="hero-copy reveal">
-          <p class="eyebrow">Export intelligence, connected</p>
-          <h1 id="hero-title">글로벌 수출의 복잡함, <em>AI로 더 단순하게.</em></h1>
-          <p class="hero-lead">바이어 발굴부터 글로벌 규제 검증, 아웃리치와 수출 실무까지. nexuscouter가 데이터와 AI 자동화로 기업의 해외 진출을 지원합니다.</p>
-          
-          <!-- 버튼 그룹: 3개의 앱을 모두 빠르게 실행할 수 있도록 배치 -->
-          <div class="hero-actions" style="display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start;">
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <a class="btn btn--primary" href="#contact">무료 상담 신청 <span aria-hidden="true">↗</span></a>
-              <a class="btn btn--ghost" href="#services">서비스 살펴보기 <span aria-hidden="true">→</span></a>
-            </div>
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <a class="btn" href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer" style="border: 2px solid #2563eb; background-color: #ffffff; color: #2563eb; font-weight: 600; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
-                AI 해외마케팅 어드바이저 <span aria-hidden="true">↗</span>
-              </a>
-              <a class="btn" href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer" style="border: 2px solid #0d9488; background-color: #ffffff; color: #0d9488; font-weight: 600; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
-                물류 시뮬레이터 <span aria-hidden="true">↗</span>
-              </a>
-              <!-- 👇 새로 추가된 앱 버튼 -->
-              <a class="btn" href="여기에_새로운_앱_주소_입력" target="_blank" rel="noopener noreferrer" style="border: 2px solid #7c3aed; background-color: #ffffff; color: #7c3aed; font-weight: 600; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
-                신규 AI 툴 실행 <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-          </div>
+st.set_page_config(page_title="K-뷰티·K-푸드 수출 가이드", page_icon="📦", layout="wide")
 
-          <div class="trust-row" aria-label="핵심 가치">
-            <span>Data-driven Buyer Discovery</span>
-            <span>AI-powered Outreach</span>
-            <span>Export Compliance Support</span>
-          </div>
-        </div>
+st.title("K-뷰티·K-푸드 해외영업·수출마케팅 가이드")
+st.caption("일본·미국·동남아·유럽 | 2026.10.29 기준 | 규제와 관세는 수시로 바뀝니다. 거래 전 최신 내용을 확인하세요.")
 
-        <div class="dashboard-wrap reveal" aria-label="제품 화면 예시">
-          <div class="dashboard">
-            <div class="dashboard-topbar"><div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div><span class="dashboard-label">nexuscouter / workspace</span></div>
-            <div class="dashboard-body">
-              <aside class="dashboard-side" aria-hidden="true"><div class="side-logo"><b></b>nexuscouter</div><div class="side-nav"><span class="active">Overview</span><span>Buyer Discovery</span><span>Outreach</span><span>Compliance</span><span>Cost Simulator</span></div></aside>
-              <div class="dashboard-main">
-                <div class="dashboard-head"><div><h3>Market overview</h3><p>예시 데이터 · 실시간 연동 아님</p></div><span class="badge-live">sample view</span></div>
-                <div class="dashboard-metrics"><div class="metric"><small>Target markets</small><strong>08</strong><em>+2 this week</em></div><div class="metric"><small>Buyer candidates</small><strong>124</strong><em>sample pool</em></div><div class="metric"><small>Compliance checks</small><strong>18</strong><em>in review</em></div></div>
-                <div class="dashboard-columns"><div class="dash-card"><h4>Buyer discovery pipeline</h4><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="chart-legend"><span>shortlisted</span><span>contact plan</span></div></div><div class="dash-card"><h4>Priority buyers</h4><div class="buyer-list"><div class="buyer"><span class="buyer-avatar">EU</span><div class="buyer-copy"><strong>Northstar Retail</strong><span>DE · Beauty</span></div></div><div class="buyer"><span class="buyer-avatar">US</span><div class="buyer-copy"><strong>Harbor &amp; Co.</strong><span>US · Consumer</span></div></div><div class="buyer"><span class="buyer-avatar">JP</span><div class="buyer-copy"><strong>Mirai Trading</strong><span>JP · Lifestyle</span></div></div></div></div></div>
-              </div>
-            </div>
-          </div>
-          <div class="float-card"><div class="float-card-head"><small>Buyer profile · example</small><span class="score">92%</span></div><div class="float-line"><i>✓</i><div><strong>Fit signal</strong><span>Product / market match</span></div></div></div>
-        </div>
-      </div>
-    </section>
+tab_guide, tab_price, tab_landed = st.tabs(["가이드", "역산 가격 계산기", "도착 원가 시뮬레이터"])
 
-    <!-- (이하 기존 섹션들 동일 유지) -->
-  </main>
+# ---------------------------------------------------------------- 가이드
+with tab_guide:
+    st.warning("**지금 확인해야 할 시한**\n\n" + "\n".join(f"- {d}" for d in DEADLINES))
 
-  <footer class="site-footer" id="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>nexuscouter</a>
-          <p>데이터와 AI 지원으로 중소기업의 글로벌 진출 업무를 체계화합니다.</p>
-        </div>
-        <nav class="footer-links" aria-label="푸터 메뉴">
-          <a href="#services">서비스</a>
-          <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
-          <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터</a>
-          <a href="여기에_새로운_앱_주소_입력" target="_blank" rel="noopener noreferrer">신규 AI 툴</a>
-          <a href="#process">프로세스</a>
-          <a href="#pricing">요금제</a>
-          <a href="#faq">FAQ</a>
-          <a href="mailto:contact@nexuscouter.co.kr">문의</a>
-        </nav>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 nexuscouter. All rights reserved.</span>
-        <span class="legal-note">개인정보 처리방침과 이용약관은 운영 정책 확정 후 게시됩니다.</span>
-      </div>
-    </div>
-  </footer>
-  <script src="assets/js/main.js" defer></script>
-</body>
-</html>
+    col1, col2 = st.columns([2, 3])
+    with col1:
+        cat = st.radio("분류", ["전체"] + list(CATEGORIES.values()), horizontal=True)
+    with col2:
+        q = st.text_input("검색", placeholder="예: 할랄, MoCRA, FOB")
+
+    for ch in CHAPTERS:
+        if cat != "전체" and CATEGORIES[ch["cat"]] != cat:
+            continue
+        text = ch["title"] + ch["summary"] + " ".join(ch["points"])
+        if q and q.lower() not in text.lower():
+            continue
+        with st.expander(f"{ch['no']}장. {ch['title']}"):
+            st.write(ch["summary"])
+            for p in ch["points"]:
+                st.markdown(f"- {p}")
+            st.caption("표, 템플릿, 확인이 필요한 항목은 문서 버전에 있습니다.")
+
+# ---------------------------------------------------------------- 역산 가격
+with tab_price:
+    st.subheader("역산 가격 계산기")
+    st.write("현지 소비자가에서 거꾸로 계산해, 우리가 받을 수 있는 FOB 가격을 확인합니다. (마진은 판매가 기준)")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        retail = st.number_input("현지 소비자가 (세금 제외, USD)", min_value=0.0, value=20.0, step=0.5)
+        r_margin = st.slider("리테일러 마진 (%)", 0, 80, 40)
+        d_margin = st.slider("총판 마진 (%)", 0, 60, 20)
+    with c2:
+        duty = st.number_input("수입 관세율 (%)", min_value=0.0, value=12.5, step=0.5)
+        other = st.number_input("개당 물류·등록·기타 비용 (USD)", min_value=0.0, value=0.5, step=0.1)
+        our_cost = st.number_input("우리 FOB 원가 (제조원가+관리비, USD)", min_value=0.0, value=5.0, step=0.1)
+
+    retailer_buy = retail * (1 - r_margin / 100)
+    dist_buy = retailer_buy * (1 - d_margin / 100)
+    fob_max = max((dist_buy - other) / (1 + duty / 100), 0.0)
+    margin = (fob_max - our_cost) / fob_max * 100 if fob_max > 0 else 0.0
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("리테일러 매입가", f"${retailer_buy:,.2f}")
+    m2.metric("총판 매입가", f"${dist_buy:,.2f}")
+    m3.metric("수출 가능 FOB 상한", f"${fob_max:,.2f}")
+    st.metric("이 가격으로 팔 때 우리 마진", f"{margin:,.1f}%")
+    if fob_max > 0 and margin < 0:
+        st.error("원가가 FOB 상한보다 높습니다. 소비자가 인상, 용량·구성 변경, 비용 조정이 필요합니다.")
+    st.caption("관세율은 FOB에 비례한다고 가정한 단순 계산입니다. 실제 관세와 비용은 관세사와 확인하세요.")
+
+# ---------------------------------------------------------------- 도착 원가
+with tab_landed:
+    st.subheader("도착 원가 시뮬레이터")
+    st.write("바이어 입장에서 제품이 도착했을 때 개당 원가를 계산해, 견적의 경쟁력을 점검합니다.")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        fob = st.number_input("FOB 단가 (USD)", min_value=0.0, value=8.0, step=0.1)
+        qty = st.number_input("수량 (개)", min_value=1, value=5000, step=100)
+        freight = st.number_input("국제 운임 총액 (USD)", min_value=0.0, value=1500.0, step=100.0)
+        insurance = st.number_input("보험료 총액 (USD)", min_value=0.0, value=100.0, step=10.0)
+    with c2:
+        basis = st.radio("과세가격 기준", ["FOB 기준 (미국 등)", "CIF 기준 (EU·일본 등)"],
+                         help="국가별로 다릅니다. 반드시 [확인]하세요.")
+        duty2 = st.number_input("적용 관세율 (%)", min_value=0.0, value=12.5, step=0.5, key="duty2")
+        local = st.number_input("현지 통관·내륙 운송·창고 총액 (USD)", min_value=0.0, value=800.0, step=50.0)
+
+    goods = fob * qty
+    cif = goods + freight + insurance
+    base = goods if basis.startswith("FOB") else cif
+    duty_amt = base * duty2 / 100
+    total = cif + duty_amt + local
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("CIF 총액", f"${cif:,.0f}")
+    m2.metric("관세", f"${duty_amt:,.0f}")
+    m3.metric("도착 총원가", f"${total:,.0f}")
+    st.metric("개당 도착 원가", f"${total / qty:,.2f}")
+    st.caption("미국 관세 구조는 2026년에 여러 번 바뀌었습니다(한국 총 12.5% 구조, 추가 조사 진행 중). 견적 전 최신 내용을 확인하세요.")
