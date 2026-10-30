@@ -21,31 +21,38 @@ with tab_guide:
 
     st.markdown("#### 🗂️ 카테고리 분류 선택")
     all_cats = ["전체"] + list(CATEGORIES.values())
-    
-    # 라디오 버튼을 가로형으로 배치하여 한눈에 보이도록 구성
     cat = st.radio("분류 선택", all_cats, horizontal=True, label_visibility="collapsed")
     
     st.markdown("---")
     q = st.text_input("🔍 검색", placeholder="예: 할랄, MoCRA, FOB, 통관 등 키워드를 입력하세요.")
 
+    # 필터링된 챕터 추출
+    filtered_chapters = []
     for ch in CHAPTERS:
         if cat != "전체" and CATEGORIES[ch["cat"]] != cat:
             continue
         text = ch["title"] + ch["summary"] + " ".join(ch["points"])
         if q and q.lower() not in text.lower():
             continue
-        with st.expander(f"제 {ch['no']}장. {ch['title']} ({ch['cat']})"):
-            st.write(ch["summary"])
-            for p in ch["points"]:
-                st.markdown(f"- {p}")
-            st.caption("💡 표, 템플릿, 추가 세부 확인 항목은 상세 문서 버전을 참고하세요.")
+        filtered_chapters.append(ch)
+
+    # 3열(Columns) 그리드 구조로 챕터 배치 및 제목 뒤 (a) 제거 적용
+    cols = st.columns(3)
+    for idx, ch in enumerate(filtered_chapters):
+        with cols[idx % 3]:
+            # 제목 뒤의 (a) 문자열 깔끔하게 제거
+            clean_title = ch['title'].replace(" (a)", "").replace("(a)", "").strip()
+            with st.expander(f"제 {ch['no']}장. {clean_title}"):
+                st.write(ch["summary"])
+                for p in ch["points"]:
+                    st.markdown(f"- {p}")
+                st.caption("💡 표, 템플릿 및 상세 문서는 버전을 참고하세요.")
 
 # ---------------------------------------------------------------- 역산 가격 계산기 탭
 with tab_price:
     st.subheader("💰 역산 가격 계산기")
     st.write("현지 소비자가에서 거꾸로 계산해 우리가 받을 수 있는 FOB 가격을 확인합니다. (마진은 판매가 기준)")
 
-    # 3개 열(3 Column) 구조로 입력 항목 분산 배치
     c1, c2, c3 = st.columns(3)
     with c1:
         retail = st.number_input("현지 소비자가 (세금 제외, USD)", min_value=0.0, value=20.0, step=0.5)
@@ -79,7 +86,6 @@ with tab_landed:
     st.subheader("🚢 도착 원가 시뮬레이터")
     st.write("바이어 입장에서 제품이 최종 도착했을 때의 개당 원가를 계산해 견적 경쟁력을 점검합니다.")
 
-    # 3개 열(3 Column) 구조로 입력 항목 분산 배치
     c1, c2, c3 = st.columns(3)
     with c1:
         fob = st.number_input("FOB 단가 (USD)", min_value=0.0, value=8.0, step=0.1)
