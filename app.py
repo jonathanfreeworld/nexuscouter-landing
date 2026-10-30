@@ -12,10 +12,14 @@ tab_guide, tab_price, tab_landed = st.tabs(["가이드", "역산 가격 계산�
 with tab_guide:
     st.warning("**지금 확인해야 할 시한**\n\n" + "\n".join(f"- {d}" for d in DEADLINES))
 
-    col1, col2 = st.columns([2, 3])
-    with col1:
-        cat = st.radio("분류", ["전체"] + list(CATEGORIES.values()), horizontal=True)
-    with col2:
+    # 분류와 검색 영역을 컬럼으로 깔끔하게 배치하여 스크롤 최소화
+    col_cat, col_search = st.columns([2, 3])
+    
+    all_cats = ["전체"] + list(CATEGORIES.values())
+    
+    with col_cat:
+        cat = st.selectbox("분류 선택", all_cats)
+    with col_search:
         q = st.text_input("검색", placeholder="예: 할랄, MoCRA, FOB")
 
     for ch in CHAPTERS:
