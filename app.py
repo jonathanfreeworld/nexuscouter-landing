@@ -1,116 +1,256 @@
-import streamlit as st
-from chapters import CATEGORIES, CHAPTERS, DEADLINES
+# 장별 데이터 및 시한 정보 파일
 
-st.set_page_config(page_title="K-뷰티·K-푸드 수출 가이드", page_icon="📦", layout="wide")
+CATEGORIES = {
+    "a": "영업 기본기",
+    "b": "화장품·식품 실무",
+    "c": "권역별",
+    "d": "마케팅·운영"
+}
 
-# ---------------------------------------------------------------- 상단 눈에 띄는 헤더 디자인
-st.markdown("""
-    <div style="background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 1.8rem; border-radius: 12px; color: white; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        <h1 style="margin: 0; font-size: 1.9rem; font-weight: 700;">📦 K-뷰티·K-푸드 해외영업·수출마케팅 가이드</h1>
-        <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.9;">
-            일본 · 미국 · 동남아 · 유럽 | 기준일: 2026.10.29 | 규제와 관세는 수시로 변경되니 거래 전 반드시 최신 내용을 확인하세요.
-        </p>
-    </div>
-""", unsafe_allow_html=True)
+DEADLINES = [
+    "미국 FDA 식품 시설 등록 갱신: 2026.10.1~12.31 (미갱신 시 등록 만료로 간주)",
+    "인도네시아 할랄 인증 의무화: 2026.10.17~18부터 적용",
+    "EU 포장재 규정(PPWR): 2026.8.12부터 적용, 적합성 선언서·기술문서 요구 확산",
+    "미국 301조 관세: 한국 총 12.5% 구조로 확정, 추가 조사 진행 중"
+]
 
-tab_guide, tab_price, tab_landed = st.tabs(["📖 가이드", "💰 역산 가격 계산기", "🚢 도착 원가 시뮬레이터"])
-
-# ---------------------------------------------------------------- 가이드 탭
-with tab_guide:
-    st.warning("⚠️ **지금 확인해야 할 주요 시한**\n\n" + "\n".join(f"- {d}" for d in DEADLINES))
-
-    st.markdown("#### 🗂️ 카테고리 분류 선택")
-    all_cats = ["전체"] + list(CATEGORIES.values())
-    cat = st.radio("분류 선택", all_cats, horizontal=True, label_visibility="collapsed")
-    
-    st.markdown("---")
-    q = st.text_input("🔍 검색", placeholder="예: 할랄, MoCRA, FOB, 통관 등 키워드를 입력하세요.")
-
-    # 필터링된 챕터 추출
-    filtered_chapters = []
-    for ch in CHAPTERS:
-        if cat != "전체" and CATEGORIES[ch["cat"]] != cat:
-            continue
-        text = ch["title"] + ch["summary"] + " ".join(ch["points"])
-        if q and q.lower() not in text.lower():
-            continue
-        filtered_chapters.append(ch)
-
-    # 3열(Columns) 그리드 구조로 챕터 배치 및 제목 뒤 (a) 제거 적용
-    cols = st.columns(3)
-    for idx, ch in enumerate(filtered_chapters):
-        with cols[idx % 3]:
-            # 제목 뒤의 (a) 문자열 깔끔하게 제거
-            clean_title = ch['title'].replace(" (a)", "").replace("(a)", "").strip()
-            with st.expander(f"제 {ch['no']}장. {clean_title}"):
-                st.write(ch["summary"])
-                for p in ch["points"]:
-                    st.markdown(f"- {p}")
-                st.caption("💡 표, 템플릿 및 상세 문서는 버전을 참고하세요.")
-
-# ---------------------------------------------------------------- 역산 가격 계산기 탭
-with tab_price:
-    st.subheader("💰 역산 가격 계산기")
-    st.write("현지 소비자가에서 거꾸로 계산해 우리가 받을 수 있는 FOB 가격을 확인합니다. (마진은 판매가 기준)")
-
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        retail = st.number_input("현지 소비자가 (세금 제외, USD)", min_value=0.0, value=20.0, step=0.5)
-        r_margin = st.slider("리테일러 마진 (%)", 0, 80, 40)
-    with c2:
-        d_margin = st.slider("총판 마진 (%)", 0, 60, 20)
-        duty = st.number_input("수입 관세율 (%)", min_value=0.0, value=12.5, step=0.5)
-    with c3:
-        other = st.number_input("개당 물류·등록·기타 비용 (USD)", min_value=0.0, value=0.5, step=0.1)
-        our_cost = st.number_input("우리 FOB 원가 (제조원가+관리비, USD)", min_value=0.0, value=5.0, step=0.1)
-
-    retailer_buy = retail * (1 - r_margin / 100)
-    dist_buy = retailer_buy * (1 - d_margin / 100)
-    fob_max = max((dist_buy - other) / (1 + duty / 100), 0.0)
-    margin = (fob_max - our_cost) / fob_max * 100 if fob_max > 0 else 0.0
-
-    st.markdown("---")
-    st.markdown("#### 📊 계산 결과 요약")
-    m1, m2, m3 = st.columns(3)
-    m1.metric("리테일러 매입가", f"${retailer_buy:,.2f}")
-    m2.metric("총판 매입가", f"${dist_buy:,.2f}")
-    m3.metric("수출 가능 FOB 상한", f"${fob_max:,.2f}")
-    
-    st.metric("💡 이 가격으로 판매 시 우리 마진", f"{margin:,.1f}%")
-    if fob_max > 0 and margin < 0:
-        st.error("🚨 원가가 FOB 상한보다 높습니다. 소비자가 인상, 용량·구성 변경, 또는 비용 조정이 필요합니다.")
-    st.caption("※ 관세율은 FOB에 비례한다고 가정한 단순 계산입니다. 실제 관세 및 부수 비용은 관세사와 반드시 확인하세요.")
-
-# ---------------------------------------------------------------- 도착 원가 시뮬레이터 탭
-with tab_landed:
-    st.subheader("🚢 도착 원가 시뮬레이터")
-    st.write("바이어 입장에서 제품이 최종 도착했을 때의 개당 원가를 계산해 견적 경쟁력을 점검합니다.")
-
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        fob = st.number_input("FOB 단가 (USD)", min_value=0.0, value=8.0, step=0.1)
-        qty = st.number_input("수량 (개)", min_value=1, value=5000, step=100)
-    with c2:
-        freight = st.number_input("국제 운임 총액 (USD)", min_value=0.0, value=1500.0, step=100.0)
-        insurance = st.number_input("보험료 총액 (USD)", min_value=0.0, value=100.0, step=10.0)
-    with c3:
-        basis = st.radio("과세가격 기준", ["FOB 기준 (미국 등)", "CIF 기준 (EU·일본 등)"],
-                         help="국가별로 과세 기준이 다릅니다.")
-        duty2 = st.number_input("적용 관세율 (%)", min_value=0.0, value=12.5, step=0.5, key="duty2")
-        local = st.number_input("현지 통관·내륙 운송·창고 총액 (USD)", min_value=0.0, value=800.0, step=50.0)
-
-    goods = fob * qty
-    cif = goods + freight + insurance
-    base = goods if basis.startswith("FOB") else cif
-    duty_amt = base * duty2 / 100
-    total = cif + duty_amt + local
-
-    st.markdown("---")
-    st.markdown("#### 📊 도착 원가 분석 결과")
-    m1, m2, m3 = st.columns(3)
-    m1.metric("CIF 총액", f"${cif:,.0f}")
-    m2.metric("관세", f"${duty_amt:,.0f}")
-    m3.metric("도착 총원가", f"${total:,.0f}")
-    
-    st.metric("📦 개당 최종 도착 원가", f"${total / qty:,.2f}")
-    st.caption("※ 미국 관세 구조는 최근 변동성이 큽니다(기본 한국 관세 구조 및 추가 조사 사항 반영). 정식 견적 전 현지 규정을 재확인하세요.")
+CHAPTERS = [
+    {
+        "no": 1,
+        "cat": "a",
+        "title": "해외영업 프로세스 전체 지도",
+        "summary": "12단계 흐름과 KPI. 규제 점검을 바이어 발굴보다 먼저 둡니다.",
+        "points": [
+            "12단계: 시장 선정 → 규제 점검 → 바이어 발굴 → 검증 → RFQ → 견적 → 샘플 → 협상 → 계약 → 선적 → 통관 → 재주문",
+            "규제 점검은 바이어 발굴보다 먼저 한다",
+            "KPI: 첫 회신 시간, 샘플에서 발주 전환율, 재주문율, 클레임 비율",
+            "자사 데이터를 3~6개월 쌓아 기준선을 만든다"
+        ]
+    },
+    {
+        "no": 2,
+        "cat": "a",
+        "title": "바이어 발굴",
+        "summary": "바이어 유형별 첫 접점과 콜드메일 5문장 원칙.",
+        "points": [
+            "바이어 유형 구분: 총판, 리테일러, 이커머스 셀러, 전문 채널, OEM 파트너",
+            "유형별 첫 접점: 전시회 후속 미팅, 현지 브로커, 마켓플레이스 메시지, 업계 행사",
+            "KOTRA·aT 매칭을 활용하고 플랫폼 문의는 반드시 검증",
+            "콜드메일 5문장: 제목, 선택 이유, 차별점 증거, 준비 상태, 다음 단계"
+        ]
+    },
+    {
+        "no": 3,
+        "cat": "a",
+        "title": "바이어 검증과 사기 예방",
+        "summary": "법적·운영·시장·제3자 증거 4종과 위험도별 검증 강도.",
+        "points": [
+            "증거 4종: 법적, 운영, 시장, 제3자",
+            "이상 신호: 규제 책임 질문에 답하지 못함, 인증 서류 없이 대량 제안, 상표 선점 제안",
+            "가짜 L/C·PO는 은행 확인, 계좌 변경은 전화로 재확인",
+            "위험도별: 소액 샘플은 1~2종, 대량·독점은 4종 + 법률 검토 + 수출보험"
+        ]
+    },
+    {
+        "no": 4,
+        "cat": "a",
+        "title": "견적 요청(RFQ) 대응",
+        "summary": "접수 카드로 문의를 기록하고 1~4등급으로 나눠 대응합니다.",
+        "points": [
+            "RFQ 접수 카드 11칸: 제품, 물량, 판매국, 규제 책임, 라벨, 유통기한, 가격 기준점, 거래 조건, 신원, 시한, 샘플",
+            "대응 등급: 당일 응대 / 2영업일 견적 / 팀 단위 제안 / NDA 후 OEM 가견적",
+            "샘플 기준은 하나로 문서화해 같은 조건으로 안내"
+        ]
+    },
+    {
+        "no": 5,
+        "cat": "a",
+        "title": "견적서 작성과 발송",
+        "summary": "Quotation과 PI의 차이, 바이어의 질문 6칸, 2026년 필수 가격 변동 조항.",
+        "points": [
+            "Quotation은 가격 제시, PI는 발주·송금용 사전 송장",
+            "바이어의 질문 6칸: 누가, 무엇을, 얼마, 어떤 조건, 어떻게 도착, 달라지면",
+            "2026년에는 관세·환율 변동 재협의 조항이 사실상 필수",
+            "DDP 견적은 관세 변동 위험을 셀러가 부담"
+        ]
+    },
+    {
+        "no": 6,
+        "cat": "a",
+        "title": "인코텀즈와 가격 산정",
+        "summary": "쓰는 규칙만 골라 보고, 소비자가에서 거꾸로 계산하는 역산 가격.",
+        "points": [
+            "신규 바이어는 FCA·FOB 기본, 컨테이너 화물은 FCA가 더 맞는 경우가 많음",
+            "미국행 DDP는 피한다",
+            "역산 가격: 소비자가 → 리테일 마진 → 총판 마진 → 관세·물류 → FOB (가상 예: USD 20이면 약 USD 8.6)",
+            "수량별 3단계 가격표로 협상 여지를 구조화"
+        ]
+    },
+    {
+        "no": 7,
+        "cat": "a",
+        "title": "가격 협상과 Best Price 대응",
+        "summary": "회신 신호 읽기, 양보 기록표, K-뷰티·K-푸드 협상 카드.",
+        "points": [
+            "Best Price는 회신에서 드러나는 신호로 의도를 읽는다",
+            "하한선 먼저, 한 번에 하나만 양보, 양보에 조건과 기한 붙이기",
+            "협상 카드: 마케팅 지원, 규제 서류, 전용 SKU, 재고 교환, 지역 독점",
+            "독점은 반드시 최소 구매 약정과 함께"
+        ]
+    },
+    {
+        "no": 8,
+        "cat": "a",
+        "title": "계약·결제·선적 실무",
+        "summary": "계약 핵심 조항, 결제 방식별 위험, 선적 서류와 선적 전 점검.",
+        "points": [
+            "계약 핵심: 독점 범위, 규제·인증 책임, 상표권, 클레임, 중재 조항",
+            "결제: 신규 바이어는 T/T 선금, L/C는 서류 불일치 주의, 후불은 수출보험",
+            "선적 서류(CI, PL, B/L, C/O 등)의 품명·HS·수량 일치",
+            "선적 전 라벨·로트·포장 사진 확인"
+        ]
+    },
+    {
+        "no": 9,
+        "cat": "a",
+        "title": "인증·규제 체크 프레임워크",
+        "summary": "시장 진입 전 5가지 질문과 규제 정보 출처.",
+        "points": [
+            "시장 진입 전 5질문: 수입자, 등록·신고, 성분·첨가물, 라벨, 추가 인증",
+            "광고·효능 표현과 샘플 반입 규정도 확인",
+            "등록은 승인이 아니다",
+            "정보 출처: 식약처, KOTRA, aT, 각국 규제기관. 날짜를 기록하고 6개월마다 재점검"
+        ]
+    },
+    {
+        "no": 10,
+        "cat": "a",
+        "title": "수출 마케팅 총론",
+        "summary": "B2B·B2C 두 층위, 포지셔닝, 3단계 로드맵.",
+        "points": [
+            "B2B(카탈로그, 규제 자료 팩, 샘플 키트)와 B2C(현지 콘텐츠, 리뷰, 광고) 두 층위",
+            "포지셔닝과 4P 현지화",
+            "테스트(0~6개월) → 확장 → 고도화",
+            "규제·인증 비용을 마케팅비보다 먼저 확보"
+        ]
+    },
+    {
+        "no": 11,
+        "cat": "b",
+        "title": "K-뷰티·K-푸드 시장 개관과 포지셔닝",
+        "summary": "숫자로 본 현재 위치, 권역별 포지셔닝, 어디서부터 시작할지.",
+        "points": [
+            "2025년 화장품 수출 약 114억 달러, 세계 2위 수출국",
+            "K-푸드+ 수출 136.2억 달러, 농식품은 처음 100억 달러 돌파",
+            "진입 순서 예: 미국 이커머스로 데이터 확보 → 일본·동남아 총판 → 유럽",
+            "규제 부담이 낮은 품목부터: 스킨케어·마스크팩, 상온 가공식품"
+        ]
+    },
+    {
+        "no": 12,
+        "cat": "b",
+        "title": "화장품 수출 실무",
+        "summary": "규제 자료 팩, 라벨, 기능성화장품이 해외에서 다르게 분류되는 문제.",
+        "points": [
+            "규제 자료 팩: INCI 전성분, COA, SDS, ISO 22716, 안전성 자료, 효능 근거",
+            "한국 기능성화장품은 미국에서 OTC 의약품, 일본에서 의약부외품으로 분류될 수 있음",
+            "시장별 라벨·클레임 버전을 운영",
+            "효능 표현 허용 목록을 만들어 공유"
+        ]
+    },
+    {
+        "no": 13,
+        "cat": "b",
+        "title": "식품 수출 실무",
+        "summary": "서류, 라벨·알레르겐, 동물성 원료, 소비기한과 콜드체인.",
+        "points": [
+            "서류: 원재료 명세, 영양 분석, HACCP·FSSC, COA, 위생증명",
+            "알레르겐: 미국 9종(참깨 포함), EU 14종",
+            "동물성 원료가 든 가공식품은 사전 확인",
+            "소비기한과 잔여 기간 합의, 김치 등 발효식품은 포장·냉장 설계"
+        ]
+    },
+    {
+        "no": 14,
+        "cat": "c",
+        "title": "미국",
+        "summary": "2026년 관세 구조, MoCRA, FDA 시설 등록과 FSVP.",
+        "points": [
+            "관세: 한국 총 12.5% 구조(2026.7.23 확정), 추가 조사 진행 중이라 견적에 변동 조항",
+            "화장품 MoCRA: 시설 등록 2년·제품 리스팅 연 1회, 책임자, 안전성 자료",
+            "식품: FDA 시설 등록 갱신 10.1~12.31, US Agent, Prior Notice, FSVP, 영문 라벨",
+            "FDA 등록번호는 승인이 아니다"
+        ]
+    },
+    {
+        "no": 15,
+        "cat": "c",
+        "title": "일본",
+        "summary": "제조판매업·외국제조업자 인정, 일반화장품과 의약부외품, 일본어 라벨.",
+        "points": [
+            "일본은 수입 화장품 시장에서 한국이 4년 연속 1위",
+            "제조판매업 허가 업체 필요, 외국제조업자 인정, 일반화장품 신고 vs 의약부외품 승인",
+            "일본어 라벨, 엄격한 광고 표현, 상표 선출원",
+            "식품: 식품위생법 수입 신고, 일본어 라벨, 결재 문화로 장기전"
+        ]
+    },
+    {
+        "no": 16,
+        "cat": "c",
+        "title": "동남아",
+        "summary": "인도네시아 할랄 의무화, 국가별 통지, 현지화 포인트.",
+        "points": [
+            "인도네시아 할랄 의무화 2026.10.17~18 적용, 인증 3~9개월 소요",
+            "한국 정부 협의: 슈퍼바이저 인정 확대, 중복 실사 면제 등",
+            "국가별 화장품 통지(BPOM, NPRA 등)와 현지 수입자 필요",
+            "고온다습 안정성, 소용량, 할랄·비건 표기"
+        ]
+    },
+    {
+        "no": 17,
+        "cat": "c",
+        "title": "유럽",
+        "summary": "EU 책임자·CPNP·CPSR, 포장 규정 PPWR, 향료 알레르겐 82종.",
+        "points": [
+            "화장품: EU 책임자, CPNP 통지, CPSR, PIF",
+            "2026 변경: INCI 갱신, 향료 알레르겐 82종, PPWR(8.12), CMR 퇴출 단축",
+            "PPWR 대응: 포장 인벤토리, PFAS 시험, DoC·TD, EPR",
+            "식품: 1169/2011 라벨, 알레르겐 14종, 동물성 원료 요건"
+        ]
+    },
+    {
+        "no": 18,
+        "cat": "d",
+        "title": "디지털 마케팅과 크로스보더 이커머스",
+        "summary": "판매 모델 비교, 콘텐츠 현지화, 인플루언서, 광고 KPI.",
+        "points": [
+            "판매 모델: 총판 / 마켓플레이스 / 3PL·자사몰 / 소셜커머스",
+            "권장 순서: 마켓플레이스 테스트 → 총판 → 3PL",
+            "현지화 콘텐츠, 광고 표시 의무를 지키는 인플루언서",
+            "KPI: ROAS, CAC, 전환율, 리뷰, 재구매율"
+        ]
+    },
+    {
+        "no": 19,
+        "cat": "d",
+        "title": "물류·FTA·정부지원·지식재산",
+        "summary": "물류 기본, HS코드, FTA, 정부 지원, 상표 선출원과 가품 대응.",
+        "points": [
+            "물류: FCL·LCL·특송, 여름 해상 고온, 식품 콜드체인",
+            "HS코드와 FTA 원산지(한-미, 한-EU, 한-아세안, RCEP)",
+            "지원: 수출바우처(약 470억 원), aT, KOTRA, K-SURE, 할랄 인증비 지원",
+            "상표 선출원, 총판 계약에 상표권 한국 본사 귀속 명시"
+        ]
+    },
+    {
+        "no": 20,
+        "cat": "d",
+        "title": "부록",
+        "summary": "영문 이메일 템플릿 6종, 체크리스트, 시한 항목, 용어집.",
+        "points": [
+            "영문 이메일 템플릿 6종: 콜드메일, RFQ 회신, 견적, Best Price, 샘플, 후속",
+            "체크리스트: 바이어 검증, 견적서, 선적 전, 화장품·식품 준비",
+            "시한 항목 모음과 용어집"
+        ]
+    }
+]
