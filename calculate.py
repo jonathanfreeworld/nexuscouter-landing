@@ -6,93 +6,28 @@ from typing import Dict, List, Tuple
 import pandas as pd
 import streamlit as st
 
-# chapters.py에서 가이드 데이터 불러오기
-from chapters import CATEGORIES, CHAPTERS, DEADLINES
-
 st.set_page_config(
     page_title="해외 수출 컨테이너 혼재 적재 및 원가 시뮬레이터",
     layout="wide",
 )
 
-# ---------------------------------------------------------------- 상단 눈에 띄는 헤더 및 공통 환율 설정
 st.markdown("""
     <div style="background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 1.8rem; border-radius: 12px; color: white; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
         <h1 style="margin: 0; font-size: 1.9rem; font-weight: 700;">📦 해외 수출 컨테이너 혼재 적재 및 원가 통합 시뮬레이터</h1>
         <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.9;">
-            수출마케팅 가이드부터 컨테이너 적재 입수량 산출, 역산 가격, 정밀 도착 원가(Landed Cost)까지 하나의 플랫폼에서 연동하세요.
+            컨테이너 적재 입수량 산출, 역산 가격, 정밀 도착 원가(Landed Cost)를 시뮬레이션하세요.
         </p>
     </div>
 """, unsafe_allow_html=True)
 
-# 공통 환율 입력 바 (모든 탭에서 공유)
-col_ex1, col_ex2, col_ex3 = st.columns([1, 2, 2])
-with col_ex1:
-    GLOBAL_EXCHANGE_RATE = st.number_input(
-        "💱 적용 환율 (KRW / 1 USD)",
-        min_value=100.0,
-        value=1350.0,
-        step=10.0,
-        help="모든 시뮬레이터와 가격 계산에 공통으로 반영되는 기준 환율입니다."
-    )
-
-st.markdown("---")
-
-# 탭 구성
-tab_guide, tab_load, tab_price, tab_landed = st.tabs([
-    "📖 수출마케팅 가이드", 
+# 탭 구성 (가이드 제외, 시뮬레이터 위주)
+tab_load, tab_price, tab_landed = st.tabs([
     "📦 컨테이너 혼재 적재 시뮬레이터", 
     "💰 정밀 역산 가격 계산기", 
     "🚢 정밀 도착 원가 (Landed Cost)"
 ])
 
-
-# ================================================================ 1. 수출마케팅 가이드 탭
-with tab_guide:
-    st.warning("⚠️ **지금 확인해야 할 주요 시한**\n\n" + "\n".join(f"- {d}" for d in DEADLINES))
-
-    st.markdown("#### 🗂️ 카테고리 분류 선택")
-    all_cats = ["전체"] + list(CATEGORIES.values())
-    cat = st.radio("분류 선택", all_cats, horizontal=True, label_visibility="collapsed")
-    
-    st.markdown("---")
-    q = st.text_input("🔍 검색", placeholder="예: 할랄, MoCRA, FOB, 통관 등 키워드를 입력하세요.")
-
-    filtered_chapters = []
-    for ch in CHAPTERS:
-        if cat != "전체" and CATEGORIES[ch["cat"]] != cat:
-            continue
-        text = ch["title"] + ch["summary"] + " ".join(ch["points"])
-        if q and q.lower() not in text.lower():
-            continue
-        filtered_chapters.append(ch)
-
-    def transpose_for_columns(item_list, num_cols=3):
-        n = len(item_list)
-        if n == 0:
-            return []
-        rows = math.ceil(n / num_cols)
-        transposed = []
-        for r in range(rows):
-            for c in range(num_cols):
-                idx = c * rows + r
-                if idx < n:
-                    transposed.append(item_list[idx])
-        return transposed
-
-    display_chapters = transpose_for_columns(filtered_chapters, num_cols=3)
-
-    cols = st.columns(3)
-    for idx, ch in enumerate(display_chapters):
-        with cols[idx % 3]:
-            clean_title = ch['title'].replace(" (a)", "").replace("(a)", "").strip()
-            with st.expander(f"제 {ch['no']}장. {clean_title}"):
-                st.write(ch["summary"])
-                for p in ch["points"]:
-                    st.markdown(f"- {p}")
-                st.caption("💡 표, 템플릿 및 상세 문서는 버전을 참고하세요.")
-
-
-# ================================================================ 2. 컨테이너 혼재 적재 시뮬레이터 탭
+# ================================================================ 1. 컨테이너 혼재 적재 시뮬레이터 탭
 CONTAINER_SPECS = {
     "20ft Standard": {"length": 5898, "width": 2352, "height": 2393, "max_payload": 28000, "cbm": 33.2},
     "40ft Standard": {"length": 12032, "width": 2352, "height": 2393, "max_payload": 28800, "cbm": 67.7},
@@ -177,42 +112,6 @@ def calculate_mixed_pallet_plan(sku_inputs, pallet_l, pallet_w, pallet_height, p
             "mixed_pallets": pallets_with_sku, "effective_layer_capacity": meta["effective_layer_capacity"]
         })
     return results, mixed_pallets
-
-def create_excel_report(selected_container, container, results, mixed_pallets, total_boxes, total_cbm, total_cargo_weight, total_pallets, total_pallet_weight, total_weight, base_pallet_capacity, effective_pallet_capacity, pallet_layout, cbm_rate, is_cbm_ok, is_weight_ok, is_pallet_ok, is_double_stack, safety_margin, pallet_l, pallet_w, pallet_height, pallet_weight, max_stack_height, pallet_max_load):
-    output = BytesIO()
-    overall_ok = is_cbm_ok and is_weight_ok and is_pallet_ok and total_boxes > 0
-    summary_df = pd.DataFrame([
-        ["시뮬레이션 일시", datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
-        ["컨테이너", selected_container],
-        ["최종 판정", "적합" if overall_ok else "검토 필요"],
-        ["총 박스 수", total_boxes],
-        ["총 필요 파레트 수", total_pallets],
-        ["안전 마진 반영 파레트 한도", effective_pallet_capacity],
-        ["이론 화물 CBM", round(total_cbm, 3)],
-        ["컨테이너 명목 CBM", container["cbm"]],
-        ["이론 CBM 비율(%)", round(cbm_rate, 1)],
-        ["화물 순중량(kg)", round(total_cargo_weight, 2)],
-        ["파레트 총중량(kg)", round(total_pallet_weight, 2)],
-        ["총 선적중량(kg)", round(total_weight, 2)],
-        ["허용 화물중량(kg)", container["max_payload"]],
-    ], columns=["항목", "값"])
-
-    sku_rows = []
-    for item in results:
-        if item["boxes"] > 0:
-            sku_rows.append({
-                "SKU/품목명": item["name"], "박스 수량": int(item["boxes"]), "필요 파레트 수": int(item["pallets"]),
-                "박스 CBM": round(item["cbm"], 3), "화물중량(kg)": round(item["cargo_weight"], 2),
-                "파레트당 1층 수량": int(item["layer_capacity"]), "적재 층수": int(item["layers"]),
-                "기하학적 파레트당 최대 수량": int(item["boxes_per_pallet_geometry"]), "최종 파레트당 적용 수량": int(item["boxes_per_pallet"]),
-                "파레트 배치 방향": item["pallet_layout"], "파레트당 허용 화물중량(kg)": round(item["max_cargo_weight_per_pallet"], 2)
-            })
-    sku_df = pd.DataFrame(sku_rows)
-
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        summary_df.to_excel(writer, sheet_name="종합 결과", index=False)
-        sku_df.to_excel(writer, sheet_name="SKU별 상세", index=False)
-    return output.getvalue()
 
 with tab_load:
     st.subheader("📦 컨테이너 혼재 적재 시뮬레이터")
@@ -304,10 +203,12 @@ with tab_load:
             st.write(f"- 허용 화물중량: {container['max_payload']:,} kg")
 
 
-# ================================================================ 3. 정밀 역산 가격 계산기 탭
+# ================================================================ 2. 정밀 역산 가격 계산기 탭 (환율 포함)
 with tab_price:
     st.subheader("💰 정밀 역산 가격 (Reverse Pricing) 계산기")
-    st.write("현지 소비자가(Retail Price)에서 출발해 유통 마진, 물류비, 관세 및 수입상 마진을 차감하여 목표 FOB 단가를 산출합니다.")
+    st.write("환율 변동을 반영하여 현지 소비자가(Retail Price)에서 출발해 유통 마진, 물류비, 관세 및 수입상 마진을 차감하여 목표 FOB 단가를 산출합니다.")
+
+    ex_rate_p = st.number_input("💱 적용 환율 (KRW / 1 USD)", min_value=100.0, value=1350.0, step=10.0, key="ex_price")
 
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -330,9 +231,9 @@ with tab_price:
     importer_buy_usd = retailer_buy_usd * (1 - importer_margin_pct / 100.0)
     cif_target_usd = max((importer_buy_usd - est_local_logistics_usd) / (1 + duty_pct / 100.0), 0.0)
     fob_target_usd = max(cif_target_usd - est_freight_usd - est_insurance_usd, 0.0)
-    fob_target_krw = fob_target_usd * GLOBAL_EXCHANGE_RATE
+    fob_target_krw = fob_target_usd * ex_rate_p
 
-    our_target_cost_usd = our_target_cost_krw / GLOBAL_EXCHANGE_RATE
+    our_target_cost_usd = our_target_cost_krw / ex_rate_p
     achieved_margin_pct = ((fob_target_usd - our_target_cost_usd) / fob_target_usd * 100.0) if fob_target_usd > 0 else 0.0
 
     st.markdown("---")
@@ -354,10 +255,12 @@ with tab_price:
         st.success("✨ 유통 마진과 물류·관세를 감안했을 때 충분한 수익성이 확보되는 구조입니다.")
 
 
-# ================================================================ 4. 정밀 도착 원가 시뮬레이터 탭
+# ================================================================ 3. 정밀 도착 원가 시뮬레이터 탭 (환율 포함)
 with tab_landed:
     st.subheader("🚢 정밀 도착 원가 (Landed Cost) 시뮬레이터")
-    st.write("박스 규격 및 컨테이너 입수량을 기준으로 국내 제조비, 해상운송, 관세, 현지 하역 및 마진까지 통합 산출합니다.")
+    st.write("환율 변동 및 박스 규격, 컨테이너 입수량을 기준으로 국내 제조비, 해상운송, 관세, 현지 하역 및 마진까지 통합 산출합니다.")
+
+    ex_rate_l = st.number_input("💱 적용 환율 (KRW / 1 USD)", min_value=100.0, value=1350.0, step=10.0, key="ex_land")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -403,25 +306,25 @@ with tab_landed:
     
     fob_total_krw = total_product_krw + total_domestic_krw
     fob_unit_krw = fob_total_krw / total_units if total_units > 0 else 0
-    fob_unit_usd = fob_unit_krw / GLOBAL_EXCHANGE_RATE
+    fob_unit_usd = fob_unit_krw / ex_rate_l
     fob_case_krw = fob_unit_krw * unit_per_case
     fob_case_usd = fob_unit_usd * unit_per_case
 
-    insurance_krw = insurance_usd * GLOBAL_EXCHANGE_RATE
-    freight_krw = freight_usd * GLOBAL_EXCHANGE_RATE
+    insurance_krw = insurance_usd * ex_rate_l
+    freight_krw = freight_usd * ex_rate_l
     cif_total_krw = fob_total_krw + insurance_krw + freight_krw
     cif_unit_krw = cif_total_krw / total_units if total_units > 0 else 0
-    cif_unit_usd = cif_unit_krw / GLOBAL_EXCHANGE_RATE
+    cif_unit_usd = cif_unit_krw / ex_rate_l
     cif_case_krw = cif_unit_krw * unit_per_case
     cif_case_usd = cif_unit_usd * unit_per_case
 
     duty_krw = cif_total_krw * (duty_pct_l / 100.0)
     local_logistics_usd = us_inland_usd + unloading_usd + (storage_usd_plt_m * (total_cases / 40))
-    local_logistics_krw = local_logistics_usd * GLOBAL_EXCHANGE_RATE
+    local_logistics_krw = local_logistics_usd * ex_rate_l
 
     landed_total_krw = cif_total_krw + duty_krw + local_logistics_krw
     landed_unit_krw = landed_total_krw / total_units if total_units > 0 else 0
-    landed_unit_usd = landed_unit_krw / GLOBAL_EXCHANGE_RATE
+    landed_unit_usd = landed_unit_krw / ex_rate_l
     landed_case_krw = landed_unit_krw * unit_per_case
     landed_case_usd = landed_unit_usd * unit_per_case
 
