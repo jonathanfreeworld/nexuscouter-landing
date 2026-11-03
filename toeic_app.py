@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """영어 읽기 학습 모듈 (문법·어휘·유형 공략·플래시카드)
-실행: streamlit run app.py
+실행: streamlit run toeic_app.py
 """
 import json
 import random
@@ -8,7 +8,8 @@ from pathlib import Path
 
 import streamlit as st
 
-from content import GRAMMAR, STRATEGY, VOCAB
+# toeic_content 파일명에 맞게 import 수정
+from toeic_content import GRAMMAR, STRATEGY, VOCAB
 
 PROGRESS_FILE = Path(__file__).with_name("progress.json")
 LABELS = "ABCD"
