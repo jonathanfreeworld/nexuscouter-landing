@@ -474,7 +474,7 @@ if st.sidebar.button("전체 진도 초기화"):
     st.rerun()
 
 # 레슨 본문 출력
-st.caption(공식 문서 레퍼런스: [{module['ref_name']} ↗]({module['ref_url']}))
+st.caption(f"공식 문서 레퍼런스: [{module['ref_name']} ↗]({module['ref_url']})")
 st.header(lesson["title"])
 st.html(f"<div style='line-height:1.8'>{lesson['body']}</div>")
 
