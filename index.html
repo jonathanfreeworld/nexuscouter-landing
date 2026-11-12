@@ -3,29 +3,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1b3a">
   <title>nexuscouter | AI 기반 B2B 수출 자동화 및 글로벌 컴플라이언스</title>
   <meta name="description" content="해외 바이어 발굴부터 AI 아웃리치, 글로벌 규제 검토, 수출 실무까지. nexuscouter와 함께 더 체계적으로 글로벌 시장에 진출하세요.">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:site_name" content="nexuscouter">
   <meta property="og:title" content="nexuscouter | AI 기반 B2B 수출 자동화 및 글로벌 컴플라이언스">
   <meta property="og:description" content="데이터와 AI 자동화로 복잡한 글로벌 수출 업무를 더 단순하게.">
+  <meta name="twitter:card" content="summary">
+
+  <!-- favicon 404 방지 (실제 파일이 있으면 교체) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3C/svg%3E">
+
+  <!-- 외부 Streamlit 앱 연결 선제 준비 -->
+  <link rel="preconnect" href="https://formspree.io">
+
   <link rel="stylesheet" href="assets/css/main.css">
+
+  <!-- 인라인 style 속성을 클래스로 이전. 정리 후 main.css 하단으로 옮기세요. -->
+  <style>
+    .hero-actions{display:flex;flex-direction:column;gap:.85rem;width:100%;max-width:520px}
+    .hero-actions__row{display:flex;gap:.75rem;width:100%}
+    .hero-actions__row--wrap{flex-wrap:wrap}
+    .hero-actions .btn--primary,
+    .hero-actions .btn--ghost{flex:1;text-align:center;justify-content:center}
+
+    .btn--tool{
+      --tool:#2563eb;--tool-rgb:37,99,235;
+      flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;
+      padding:.75rem 1rem;border:2px solid var(--tool);border-radius:8px;
+      background:#fff;color:var(--tool);font-size:.9rem;font-weight:600;text-decoration:none;
+      box-shadow:0 4px 12px rgba(var(--tool-rgb),.15);
+      transition:background-color .2s ease,color .2s ease
+    }
+    .btn--tool:hover,.btn--tool:focus-visible{background:var(--tool);color:#fff}
+    .btn--teal{--tool:#0d9488;--tool-rgb:13,148,136}
+    .btn--violet{--tool:#7c3aed;--tool-rgb:124,58,237}
+
+    .tool-card .sub-calculator{margin-top:0}
+    .tool-card .calc-result{margin-top:1rem}
+    .tool-card .calc-footnote{margin-top:.5rem}
+
+    .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
   <header class="site-header" id="top">
     <div class="container nav-wrap">
       <a class="brand" href="#top" aria-label="nexuscouter 홈"><span class="brand-mark" aria-hidden="true"></span>nexuscouter</a>
-      <nav class="nav-links" aria-label="주요 메뉴">
+      <nav class="nav-links" id="primary-nav" aria-label="주요 메뉴">
         <a href="#services">서비스</a>
-        <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
-        <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터</a>
-        <!-- 상단 메뉴 색상을 다른 메뉴와 동일한 흰색으로 통일 -->
-        <a href="https://nexuscouter-landing-lntlrovwsdryyusqrtj8c7.streamlit.app/" target="_blank" rel="noopener noreferrer">수출마케팅 가이드</a>
+        <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저<span class="sr-only"> (새 창)</span></a>
+        <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터<span class="sr-only"> (새 창)</span></a>
+        <a href="https://nexuscouter-landing-lntlrovwsdryyusqrtj8c7.streamlit.app/" target="_blank" rel="noopener noreferrer">수출마케팅 가이드<span class="sr-only"> (새 창)</span></a>
         <a href="#process">이용 프로세스</a>
         <a href="#pricing">요금제</a>
         <a href="#faq">FAQ</a>
         <a class="nav-cta" href="#contact">무료 상담 신청</a>
       </nav>
-      <button class="menu-toggle" type="button" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
+      <button class="menu-toggle" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="primary-nav"><span></span></button>
     </div>
   </header>
 
@@ -36,23 +77,16 @@
           <p class="eyebrow">Export intelligence, connected</p>
           <h1 id="hero-title">글로벌 수출의 복잡함, <em>AI로 더 단순하게.</em></h1>
           <p class="hero-lead">바이어 발굴부터 글로벌 규제 검증, 아웃리치와 수출 실무까지. nexuscouter가 데이터와 AI 자동화로 기업의 해외 진출을 지원합니다.</p>
-          
-          <!-- 버튼 그룹: 크기와 비율을 통일하여 보기 좋게 정렬 -->
-          <div class="hero-actions" style="display: flex; flex-direction: column; gap: 0.85rem; width: 100%; max-width: 520px;">
-            <div style="display: flex; gap: 0.75rem; width: 100%;">
-              <a class="btn btn--primary" href="#contact" style="flex: 1; text-align: center; justify-content: center;">무료 상담 신청 <span aria-hidden="true">↗</span></a>
-              <a class="btn btn--ghost" href="#services" style="flex: 1; text-align: center; justify-content: center;">서비스 살펴보기 <span aria-hidden="true">→</span></a>
+
+          <div class="hero-actions">
+            <div class="hero-actions__row">
+              <a class="btn btn--primary" href="#contact">무료 상담 신청 <span aria-hidden="true">↗</span></a>
+              <a class="btn btn--ghost" href="#services">서비스 살펴보기 <span aria-hidden="true">→</span></a>
             </div>
-            <div style="display: flex; gap: 0.75rem; width: 100%; flex-wrap: wrap;">
-              <a class="btn" href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 150px; border: 2px solid #2563eb; background-color: #ffffff; color: #2563eb; font-weight: 600; padding: 0.75rem 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; text-decoration: none; font-size: 0.9rem;">
-                AI 어드바이저 <span aria-hidden="true">↗</span>
-              </a>
-              <a class="btn" href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 150px; border: 2px solid #0d9488; background-color: #ffffff; color: #0d9488; font-weight: 600; padding: 0.75rem 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; text-decoration: none; font-size: 0.9rem;">
-                물류 시뮬레이터 <span aria-hidden="true">↗</span>
-              </a>
-              <a class="btn" href="https://nexuscouter-landing-lntlrovwsdryyusqrtj8c7.streamlit.app/" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 150px; border: 2px solid #7c3aed; background-color: #ffffff; color: #7c3aed; font-weight: 600; padding: 0.75rem 1rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; text-decoration: none; font-size: 0.9rem;">
-                수출마케팅 가이드 <span aria-hidden="true">↗</span>
-              </a>
+            <div class="hero-actions__row hero-actions__row--wrap">
+              <a class="btn--tool" href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저 <span aria-hidden="true">↗</span><span class="sr-only"> (새 창)</span></a>
+              <a class="btn--tool btn--teal" href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터 <span aria-hidden="true">↗</span><span class="sr-only"> (새 창)</span></a>
+              <a class="btn--tool btn--violet" href="https://nexuscouter-landing-lntlrovwsdryyusqrtj8c7.streamlit.app/" target="_blank" rel="noopener noreferrer">수출마케팅 가이드 <span aria-hidden="true">↗</span><span class="sr-only"> (새 창)</span></a>
             </div>
           </div>
 
@@ -71,7 +105,14 @@
               <div class="dashboard-main">
                 <div class="dashboard-head"><div><h3>Market overview</h3><p>예시 데이터 · 실시간 연동 아님</p></div><span class="badge-live">sample view</span></div>
                 <div class="dashboard-metrics"><div class="metric"><small>Target markets</small><strong>08</strong><em>+2 this week</em></div><div class="metric"><small>Buyer candidates</small><strong>124</strong><em>sample pool</em></div><div class="metric"><small>Compliance checks</small><strong>18</strong><em>in review</em></div></div>
-                <div class="dashboard-columns"><div class="dash-card"><h4>Buyer discovery pipeline</h4><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="chart-legend"><span>shortlisted</span><span>contact plan</span></div></div><div class="dash-card"><h4>Priority buyers</h4><div class="buyer-list"><div class="buyer"><span class="buyer-avatar">EU</span><div class="buyer-copy"><strong>Northstar Retail</strong><span>DE · Beauty</span></div></div><div class="buyer"><span class="buyer-avatar">US</span><div class="buyer-copy"><strong>Harbor &amp; Co.</strong><span>US · Consumer</span></div></div><div class="buyer"><span class="buyer-avatar">JP</span><div class="buyer-copy"><strong>Mirai Trading</strong><span>JP · Lifestyle</span></div></div></div></div></div>
+                <div class="dashboard-columns">
+                  <div class="dash-card"><h4>Buyer discovery pipeline</h4><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="chart-legend"><span>shortlisted</span><span>contact plan</span></div></div>
+                  <div class="dash-card"><h4>Priority buyers</h4><div class="buyer-list">
+                    <div class="buyer"><span class="buyer-avatar">EU</span><div class="buyer-copy"><strong>Northstar Retail</strong><span>DE · Beauty</span></div></div>
+                    <div class="buyer"><span class="buyer-avatar">US</span><div class="buyer-copy"><strong>Harbor &amp; Co.</strong><span>US · Consumer</span></div></div>
+                    <div class="buyer"><span class="buyer-avatar">JP</span><div class="buyer-copy"><strong>Mirai Trading</strong><span>JP · Lifestyle</span></div></div>
+                  </div></div>
+                </div>
               </div>
             </div>
           </div>
@@ -84,7 +125,7 @@
       <div class="container">
         <div class="section-heading reveal"><p class="eyebrow">The export gap</p><h2 id="problem-title">수출의 모든 단계,<br>더 이상 혼자 해결하지 마세요.</h2><p>해외 진출의 병목을 업무 단위로 나누고, 확인해야 할 정보와 다음 액션을 한눈에 정리합니다.</p></div>
         <div class="problem-grid">
-          <article class="problem-card reveal"><span class="problem-number">01 / DISCOVER</span><h3>검증된 해외 바이어를 찾기 어렵다.</h3><p>검색 결과를 넘어 품목과 시장에 맞는 바이어발굴을 지원합니다.</p><span class="problem-result">잠재바이어 기준을 명확하게</span></article>
+          <article class="problem-card reveal"><span class="problem-number">01 / DISCOVER</span><h3>검증된 해외 바이어를 찾기 어렵다.</h3><p>검색 결과를 넘어 품목과 시장에 맞는 바이어 발굴을 지원합니다.</p><span class="problem-result">잠재바이어 기준을 명확하게</span></article>
           <article class="problem-card reveal"><span class="problem-number">02 / VERIFY</span><h3>국가별 규제와 인증 요건을 파악하기 어렵다.</h3><p>국가별, 품목별 바이어를 정리하고, 검토 범위를 구분합니다.</p><span class="problem-result">확인해야 할 정보부터 정리</span></article>
           <article class="problem-card reveal"><span class="problem-number">03 / EXECUTE</span><h3>수출 실무를 처리할 전문 인력이 부족하다.</h3><p>수출가격산출, 물류, 원가, 지원사업 탐색을 실행 가능한 체크리스트로 연결합니다.</p><span class="problem-result">다음 실행을 놓치지 않게</span></article>
         </div>
@@ -117,30 +158,30 @@
             <h3>부피 참고 계산</h3>
             <span class="unit-note">단위: mm / 박스</span>
           </div>
-          <div class="sub-calculator" style="margin-top: 0;">
+          <div class="sub-calculator">
             <div class="calc-grid">
               <div class="calc-field">
                 <label for="calc-length">박스 길이</label>
-                <input id="calc-length" data-cbm-input type="number" min="0" value="400">
+                <input id="calc-length" data-cbm-input type="number" inputmode="decimal" min="0" step="any" value="400">
               </div>
               <div class="calc-field">
                 <label for="calc-width">박스 너비</label>
-                <input id="calc-width" data-cbm-input type="number" min="0" value="300">
+                <input id="calc-width" data-cbm-input type="number" inputmode="decimal" min="0" step="any" value="300">
               </div>
               <div class="calc-field">
                 <label for="calc-height">박스 높이</label>
-                <input id="calc-height" data-cbm-input type="number" min="0" value="250">
+                <input id="calc-height" data-cbm-input type="number" inputmode="decimal" min="0" step="any" value="250">
               </div>
               <div class="calc-field">
                 <label for="calc-quantity">박스 수량</label>
-                <input id="calc-quantity" data-cbm-input type="number" min="0" value="20">
+                <input id="calc-quantity" data-cbm-input type="number" inputmode="numeric" min="0" step="1" value="20">
               </div>
             </div>
-            <div class="calc-result" style="margin-top: 1rem;">
+            <div class="calc-result">
               <span>참고 부피</span>
-              <strong data-cbm-output>0.600 CBM</strong>
+              <strong data-cbm-output aria-live="polite">0.600 CBM</strong>
             </div>
-            <p class="calc-footnote" style="margin-top: 0.5rem;">CBM은 물류 견적 및 참고용으로만 활용됩니다.</p>
+            <p class="calc-footnote">CBM은 물류 견적 및 참고용으로만 활용됩니다.</p>
           </div>
         </div>
       </div>
@@ -152,17 +193,16 @@
         <div class="process-grid">
           <article class="process-step reveal"><div class="process-dot">01</div><h3>무료 상담</h3><p>제품, 목표 국가, 수출 단계와 현재 고민을 파악합니다.</p></article>
           <article class="process-step reveal"><div class="process-dot">02</div><h3>맞춤 전략 설계</h3><p>제품과 시장에 맞는 바이어 발굴 및 지원 범위를 정의합니다.</p></article>
-          <article class="process-step reveal"><div class="process-dot">03</div><h3>데이터 기반 실행</h3><p>합의된 범위에 따라 바이어발굴, 시장진출 규제 검토 및 실무 지원을 진행합니다.</p></article>
+          <article class="process-step reveal"><div class="process-dot">03</div><h3>데이터 기반 실행</h3><p>합의된 범위에 따라 바이어 발굴, 시장진출 규제 검토 및 실무 지원을 진행합니다.</p></article>
           <article class="process-step reveal"><div class="process-dot">04</div><h3>결과 공유 및 후속 관리</h3><p>확인된 정보와 진행 현황을 공유하고 다음 방향을 논의합니다.</p></article>
         </div>
       </div>
     </section>
 
+    <!-- TODO: 요금제 카드가 비어 있습니다. 내용을 채우거나, 준비 전이라면 이 섹션과 nav/footer의 #pricing 링크를 함께 제거하세요. -->
     <section class="section" id="pricing" aria-labelledby="pricing-title">
       <div class="container">
-        <div class="pricing-grid">
-         
-        </div>
+        <div class="pricing-grid"></div>
       </div>
     </section>
 
@@ -191,20 +231,24 @@
             <div><small>Response</small><span>문의 내용을 확인한 뒤 안내드립니다.</span></div>
           </div>
         </div>
-        
+
         <form class="contact-form reveal" data-contact-form action="https://formspree.io/f/mwlvgjoo" method="POST">
+          <!-- 스팸 방지 허니팟 (Formspree가 _gotcha 필드를 자동 인식) -->
+          <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input type="hidden" name="_subject" value="[nexuscouter] 새 상담 신청">
+
           <div class="form-grid">
             <div class="field">
               <label for="name">이름 <span>*</span></label>
-              <input id="name" name="name" type="text" required placeholder="홍길동">
+              <input id="name" name="name" type="text" required autocomplete="name" placeholder="홍길동">
             </div>
             <div class="field">
               <label for="company">회사명 <span>*</span></label>
-              <input id="company" name="company" type="text" required placeholder="회사명을 입력해 주세요">
+              <input id="company" name="company" type="text" required autocomplete="organization" placeholder="회사명을 입력해 주세요">
             </div>
             <div class="field">
               <label for="email">업무용 이메일 <span>*</span></label>
-              <input id="email" name="email" type="email" required placeholder="name@company.com">
+              <input id="email" name="email" type="email" required autocomplete="email" placeholder="name@company.com">
             </div>
             <div class="field">
               <label for="country">희망 진출 국가</label>
@@ -238,7 +282,7 @@
             <input type="checkbox" name="consent" required>
             <span>문의 응대를 위해 입력한 정보를 수집·이용하는 데 동의합니다. <a href="#footer">처리방침 안내</a>는 실제 운영 정책 확정 후 업데이트됩니다.</span>
           </label>
-          <button class="btn btn--primary" type="submit">무료 상담 신청하기 <span>↗</span></button>
+          <button class="btn btn--primary" type="submit">무료 상담 신청하기 <span aria-hidden="true">↗</span></button>
           <p class="form-status" role="status">상담 신청 시 Formspree를 통해 이메일이 안전하게 전송됩니다.</p>
         </form>
       </div>
@@ -254,9 +298,9 @@
         </div>
         <nav class="footer-links" aria-label="푸터 메뉴">
           <a href="#services">서비스</a>
-          <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저</a>
-          <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터</a>
-          <a href="https://nexuscouter-landing-lntlrovwsdryyusqrtj8c7.streamlit.app/" target="_blank" rel="noopener noreferrer">수출마케팅 가이드</a>
+          <a href="https://nexuscouter-landing-gwxnabqmzrxlfmsk4yata5.streamlit.app/" target="_blank" rel="noopener noreferrer">AI 어드바이저<span class="sr-only"> (새 창)</span></a>
+          <a href="https://nexuscouter-landing-co9cxcy9fjydsbw8hy729s.streamlit.app/" target="_blank" rel="noopener noreferrer">물류 시뮬레이터<span class="sr-only"> (새 창)</span></a>
+          <a href="https://nexuscouter-landing-lntlrovwsdryyusqrtj8c7.streamlit.app/" target="_blank" rel="noopener noreferrer">수출마케팅 가이드<span class="sr-only"> (새 창)</span></a>
           <a href="#process">프로세스</a>
           <a href="#pricing">요금제</a>
           <a href="#faq">FAQ</a>
@@ -269,6 +313,7 @@
       </div>
     </div>
   </footer>
+
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
