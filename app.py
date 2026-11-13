@@ -86,6 +86,7 @@ st.markdown(
 # ------------------------------------------------------------
 # 상단 헤더
 # ------------------------------------------------------------
+
 st.markdown(
     f"""
     <div style="
@@ -94,3 +95,27 @@ st.markdown(
         border-radius: 10px;
         color: white;
         margin-bottom: 0.8rem;
+    ">
+        <div style="font-size:0.78rem; letter-spacing:0.08em;
+                    opacity:0.86; margin-bottom:0.4rem;">
+            EXPORT BUSINESS CONSULTING · K-FOOD · K-BEAUTY
+        </div>
+
+        <h1 style="margin:0; font-size:1.8rem;
+                   font-weight:700; line-height:1.35;">
+            {guide_title}
+        </h1>
+
+        <p style="margin:0.55rem 0 0 0; font-size:0.98rem;
+                  line-height:1.5; opacity:0.94;">
+            {guide_subtitle}
+        </p>
+
+        <p style="margin:0.55rem 0 0 0; font-size:0.78rem;
+                  opacity:0.78;">
+            {guide_version}
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
