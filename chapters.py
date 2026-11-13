@@ -91,6 +91,19 @@ for idx, item in enumerate(_CHAPTER_DATA, start=1):
     })
 
 AI_CAPABILITY_MAP = [
-    {"technology": "언어모델·생성형 AI", "capability": "문서 초안, 요약, 번역, 분류, 질의응답", "export_use": ["제품자료 초안", "상담기록 정리", "시장정보 비교"]},
-    {"technology": "문서 인식·정보추출", "capability": "표·문서의 필드 추출과 구조화", "export_use": ["견적서 항목 추출", "인증자료 목록화", "주문정보 정리"]},
-    {"technology": "검색증강생성(RAG)", "capability": "승인된 사내자료를 검색해 근거 중심 답변 제공", "export_use": ["제품정보 도우미", "수출업무 지식검색", "규정자료 탐색 보조"]},
+    {
+        "technology": "언어모델·생성형 AI",
+        "capability": "문서 초안, 요약, 번역, 분류, 질의응답",
+        "export_use": ["제품자료 초안", "상담기록 정리", "시장정보 비교"]
+    },
+    {
+        "technology": "문서 인식·정보추출",
+        "capability": "표·문서의 필드 추출과 구조화",
+        "export_use": ["견적서 항목 추출", "인증자료 목록화", "주문정보 정리"]
+    },
+    {
+        "technology": "검색증강생성(RAG)",
+        "capability": "승인된 사내자료를 검색해 근거 중심 답변 제공",
+        "export_use": ["제품정보 도우미", "수출업무 지식검색", "규정자료 탐색 보조"]
+    },
+]
