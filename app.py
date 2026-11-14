@@ -1,3 +1,6 @@
+import streamlit as st
+st.write("연결 OK")
+
 """K-푸드·K-뷰티 AI 수출 도우미 - 콘텐츠 데이터.
 
 각 카드는 '바로 따라 할 수 있는 작업 단위'로 구성한다.
