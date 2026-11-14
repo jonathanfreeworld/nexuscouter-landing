@@ -1,15 +1,15 @@
 """K-푸드·K-뷰티 AI 수출 실행 가이드 - 콘텐츠 데이터.
 
 각 카드는 '바로 따라 할 수 있는 작업 단위'로 구성한다.
-  goal      이 카드의 목표 (한 줄)
-  time      소요 시간·시점 (예시)
-  owner     담당
+  goal      목표
+  time      소요 시간
+  owner     담당자
   tools     쓰는 도구·서비스
-  prep      준비물
-  steps     작업 순서
-  tips      현장 팁
+  prep      준비사항
+  steps     순서
+  tips      팁
   mistakes  자주 나는 실수
-  ai        AI 활용법 (사람이 확인할 지점 포함)
+  ai        AI 활용팁
   output    결과물
 """
 
