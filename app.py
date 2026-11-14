@@ -10,7 +10,7 @@ import chapters
 # 페이지 설정
 # ------------------------------------------------------------
 st.set_page_config(
-    page_title="K-푸드·K-뷰티 AI 수출 도우미",
+    page_title="K-푸드·K-뷰티 AI 수출프로세스",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -18,7 +18,7 @@ st.set_page_config(
 # ------------------------------------------------------------
 # 콘텐츠 불러오기
 # ------------------------------------------------------------
-guide_title = getattr(chapters, "GUIDE_TITLE", "AI 수출 도우미")
+guide_title = getattr(chapters, "GUIDE_TITLE", "AI 수출 프로세스")
 guide_subtitle = getattr(chapters, "GUIDE_SUBTITLE", "")
 guide_version = getattr(chapters, "GUIDE_VERSION", "")
 guide_positioning = getattr(chapters, "GUIDE_POSITIONING", "")
